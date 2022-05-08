@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32421.90
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pinax", "Pinax\Pinax.csproj", "{69AD7A93-9723-4C68-9E8B-EB668ABAAC57}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Pinax", "Test.Pinax\Test.Pinax.csproj", "{B765F881-2038-4DE6-A108-7BDC72612E2E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pinax.Console", "Pinax.Console\Pinax.Console.csproj", "{6EE611B1-EF49-489A-AB5C-AF5166A3FE4B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{69AD7A93-9723-4C68-9E8B-EB668ABAAC57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69AD7A93-9723-4C68-9E8B-EB668ABAAC57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69AD7A93-9723-4C68-9E8B-EB668ABAAC57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69AD7A93-9723-4C68-9E8B-EB668ABAAC57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B765F881-2038-4DE6-A108-7BDC72612E2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B765F881-2038-4DE6-A108-7BDC72612E2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B765F881-2038-4DE6-A108-7BDC72612E2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B765F881-2038-4DE6-A108-7BDC72612E2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6EE611B1-EF49-489A-AB5C-AF5166A3FE4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6EE611B1-EF49-489A-AB5C-AF5166A3FE4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6EE611B1-EF49-489A-AB5C-AF5166A3FE4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6EE611B1-EF49-489A-AB5C-AF5166A3FE4B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {620A7CBD-8D19-4AD8-99A8-B595F637B843}
+	EndGlobalSection
+EndGlobal
