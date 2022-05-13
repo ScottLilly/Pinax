@@ -29,6 +29,13 @@ do
 
         switch (commandWords[0].ToLowerInvariant())
         {
+            case "repos":
+                var projects = GitHubService.GetProjectFiles("scottlilly", "C#");
+                foreach (string project in projects)
+                {
+                    Console.WriteLine(project);
+                }
+                break;
             default:
                 Console.WriteLine($"Unrecognized command: '{command}'");
                 break;
@@ -50,6 +57,8 @@ Librarian SetupPinaxInstance()
 
     PinaxConfiguration pinaxConfiguration =
         PersistenceService.GetPinaxConfiguration();
+
+    GitHubService.SetToken(userSecretsToken);
 
     return new Librarian(pinaxConfiguration, userSecretsToken);
 }

@@ -24,4 +24,13 @@
     <ProjectReference Include="..\Pinax\Pinax.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="TestFiles\ProjectFiles\GenerativeArt.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="TestFiles\ProjectFiles\SudokuSolver.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
