@@ -29,7 +29,7 @@ do
 
         switch (commandWords[0].ToLowerInvariant())
         {
-            case "repos":
+            case "projects":
                 var projects = GitHubService.GetProjectFiles("scottlilly", "C#");
                 foreach (string project in projects)
                 {
