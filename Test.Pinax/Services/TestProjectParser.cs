@@ -8,25 +8,26 @@ namespace Test.Pinax.Services;
 public class TestProjectParser
 {
     [Fact]
-    public void Test_GetVersionNumber_Framework_4_5()
+    public void Test_GetVersionNumber_SudokuSolver()
     {
-        string projectFileText =
-            File.ReadAllText("./TestFiles/ProjectFiles/SudokuSolver.txt");
+        var projectFileText =
+            File.ReadAllLines("./TestFiles/ProjectFiles/SudokuSolver.txt");
 
-        var version = ProjectParser.GetVersion(projectFileText);
+        var project = ProjectParser.GetProject("SudokuSolver.csproj", projectFileText);
 
-        Assert.Equal(Project.DotNetVersion.Framework_4_5, version);
+        Assert.Equal(Project.DotNetVersion.Framework_4_5, project.Version);
     }
 
     [Fact]
-    public void Test_GetVersionNumber_NET_6()
+    public void Test_GetProject_DocVaultDAL()
     {
-        string projectFileText =
-            File.ReadAllText("./TestFiles/ProjectFiles/GenerativeArt.txt");
+        var projectFileText =
+            File.ReadAllLines("./TestFiles/ProjectFiles/DocVaultDAL.txt");
 
-        var version = ProjectParser.GetVersion(projectFileText);
+        var project = ProjectParser.GetProject("DocVaultDAL.csproj", projectFileText);
 
-        Assert.Equal(Project.DotNetVersion.Net_6, version);
+        Assert.Equal(Project.DotNetVersion.Net_5, project.Version);
+        Assert.Equal(4, project.Packages.Count);
     }
 
     [Fact]
@@ -41,17 +42,5 @@ public class TestProjectParser
         Assert.Equal(1, project.Packages.Count);
         Assert.Equal("Markdig", project.Packages[0].Name);
         Assert.Equal("0.28.1", project.Packages[0].Version);
-    }
-
-    [Fact]
-    public void Test_GetProject_DocVaultDAL()
-    {
-        var projectFileText =
-            File.ReadAllLines("./TestFiles/ProjectFiles/DocVaultDAL.txt");
-
-        var project = ProjectParser.GetProject("DocVaultDAL.csproj", projectFileText);
-
-        Assert.Equal(Project.DotNetVersion.Net_5, project.Version);
-        Assert.Equal(4, project.Packages.Count);
     }
 }

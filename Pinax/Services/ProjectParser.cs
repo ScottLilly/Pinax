@@ -20,7 +20,7 @@ public static class ProjectParser
         return project;
     }
 
-    public static List<Package> GetPackages(string projectFileText)
+    private static List<Package> GetPackages(string projectFileText)
     {
         var root = XElement.Parse(projectFileText);
         RemoveNamespacePrefix(root);
@@ -55,7 +55,7 @@ public static class ProjectParser
         return packages;
     }
 
-    public static Project.DotNetVersion GetVersion(string projectFileText)
+    private static Project.DotNetVersion GetVersion(string projectFileText)
     {
         var root = XElement.Parse(projectFileText);
         RemoveNamespacePrefix(root);
@@ -73,8 +73,38 @@ public static class ProjectParser
                 {
                     switch (targetFrameworkVersion.Value)
                     {
+                        case "v1.0":
+                            return Project.DotNetVersion.Framework_1_0;
+                        case "v1.1":
+                            return Project.DotNetVersion.Framework_1_1;
+                        case "v2.0":
+                            return Project.DotNetVersion.Framework_2_0;
+                        case "v3.0":
+                            return Project.DotNetVersion.Framework_3_0;
+                        case "v3.5":
+                            return Project.DotNetVersion.Framework_3_5;
+                        case "v4.0":
+                            return Project.DotNetVersion.Framework_4_0;
                         case "v4.5":
                             return Project.DotNetVersion.Framework_4_5;
+                        case "v4.5.1":
+                            return Project.DotNetVersion.Framework_4_5_1;
+                        case "v4.5.2":
+                            return Project.DotNetVersion.Framework_4_5_2;
+                        case "v4.6":
+                            return Project.DotNetVersion.Framework_4_6;
+                        case "v4.6.1":
+                            return Project.DotNetVersion.Framework_4_6_1;
+                        case "v4.6.2":
+                            return Project.DotNetVersion.Framework_4_6_2;
+                        case "v4.7":
+                            return Project.DotNetVersion.Framework_4_7;
+                        case "v4.7.1":
+                            return Project.DotNetVersion.Framework_4_7_1;
+                        case "v4.7.2":
+                            return Project.DotNetVersion.Framework_4_7_2;
+                        case "v4.8":
+                            return Project.DotNetVersion.Framework_4_8;
                     }
                 }
 
@@ -84,16 +114,22 @@ public static class ProjectParser
 
                 if (targetFramework?.Value != null)
                 {
-                    if (targetFramework.Value.StartsWith("net6.0", 
+                    if (targetFramework.Value.StartsWith("net5.0",
+                            StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        return Project.DotNetVersion.Net_5;
+                    }
+
+                    if (targetFramework.Value.StartsWith("net6.0",
                             StringComparison.InvariantCultureIgnoreCase))
                     {
                         return Project.DotNetVersion.Net_6;
                     }
 
-                    if (targetFramework.Value.StartsWith("net5.0",
+                    if (targetFramework.Value.StartsWith("net7.0",
                             StringComparison.InvariantCultureIgnoreCase))
                     {
-                        return Project.DotNetVersion.Net_5;
+                        return Project.DotNetVersion.Net_7;
                     }
                 }
             }
