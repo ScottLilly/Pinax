@@ -1,47 +1,61 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
+using Pinax.Models;
 
 namespace Pinax.Services;
 
 public static class ProjectParser
 {
-    public enum DotNetVersion
+    public static Project GetProject(string filename, IEnumerable<string> lines)
     {
-        Unknown,
-        Framework_1_0,
-        Framework_1_1,
-        Framework_2_0,
-        Framework_3_0,
-        Framework_3_5,
-        Framework_4_0,
-        Framework_4_5,
-        Framework_4_5_1,
-        Framework_4_5_2,
-        Framework_4_6,
-        Framework_4_6_1,
-        Framework_4_6_2,
-        Framework_4_7,
-        Framework_4_7_1,
-        Framework_4_7_2,
-        Framework_4_8,
-        Core_1_0,
-        Core_1_1,
-        Core_2_0,
-        Core_2_1,
-        Core_2_2,
-        Core_3_0,
-        Core_3_1,
-        Net_5,
-        Net_6,
-        Net_7
+        string projectFileText = string.Join(Environment.NewLine, lines);
+
+        Project project = new Project
+        {
+            FileName = filename,
+            Version = GetVersion(projectFileText)
+        };
+
+        project.Packages.AddRange(GetPackages(projectFileText));
+
+        return project;
     }
 
-    public static DotNetVersion GetVersion(string projectFileText)
+    public static List<Package> GetPackages(string projectFileText)
+    {
+        var root = XElement.Parse(projectFileText);
+        RemoveNamespacePrefix(root);
+        var itemGroups = root.Elements("ItemGroup").ToList();
+
+        var packages = new List<Package>();
+
+        foreach (var itemGroup in itemGroups)
+        {
+            var packageReferences =
+                itemGroup.Elements("PackageReference").ToList();
+
+            if (!packageReferences.Any())
+            {
+                continue;
+            }
+
+            foreach (var packageReference in packageReferences)
+            {
+                if (packageReference.Attributes("Include").Any() &&
+                    packageReference.Attributes("Version").Any())
+                {
+                    packages.Add(new Package
+                    {
+                        Name = packageReference.Attributes("Include").First().Value,
+                        Version = packageReference.Attributes("Version").First().Value
+                    });
+                }
+            }
+        }
+
+        return packages;
+    }
+
+    public static Project.DotNetVersion GetVersion(string projectFileText)
     {
         var root = XElement.Parse(projectFileText);
         RemoveNamespacePrefix(root);
@@ -60,7 +74,7 @@ public static class ProjectParser
                     switch (targetFrameworkVersion.Value)
                     {
                         case "v4.5":
-                            return DotNetVersion.Framework_4_5;
+                            return Project.DotNetVersion.Framework_4_5;
                     }
                 }
 
@@ -68,18 +82,24 @@ public static class ProjectParser
                 var targetFramework =
                     propertyGroup.Element("TargetFramework");
 
-                if (targetFramework != null)
+                if (targetFramework?.Value != null)
                 {
-                    switch (targetFramework.Value)
+                    if (targetFramework.Value.StartsWith("net6.0", 
+                            StringComparison.InvariantCultureIgnoreCase))
                     {
-                        case "net6.0-windows":
-                            return DotNetVersion.Net_6;
+                        return Project.DotNetVersion.Net_6;
+                    }
+
+                    if (targetFramework.Value.StartsWith("net5.0",
+                            StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        return Project.DotNetVersion.Net_5;
                     }
                 }
             }
         }
 
-        return DotNetVersion.Unknown;
+        return Project.DotNetVersion.Unknown;
     }
 
     private static void RemoveNamespacePrefix(XElement element)
@@ -100,5 +120,4 @@ public static class ProjectParser
             RemoveNamespacePrefix(child);
         }
     }
-
 }
