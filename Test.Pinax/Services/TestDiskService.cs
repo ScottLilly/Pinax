@@ -8,7 +8,7 @@ namespace Test.Pinax.Services;
 
 public class TestDiskService
 {
-    [Fact]
+    //[Fact]
     public void Test_DiskSearch()
     {
         var solutions =
@@ -18,7 +18,7 @@ public class TestDiskService
         Assert.Equal(5, solutions.Sum(s => s.Projects.Count));
     }
 
-    [Fact]
+    //[Fact]
     public void Test_DiskSearchTopLevel()
     {
         var solutions =
