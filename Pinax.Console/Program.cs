@@ -25,7 +25,7 @@ do
     }
     else
     {
-        var commandWords = command.Split(" ");
+        var commandWords = command.Trim().Split(" ", StringSplitOptions.RemoveEmptyEntries);
 
         switch (commandWords[0].ToLowerInvariant())
         {
@@ -34,6 +34,24 @@ do
                 foreach (string project in projects)
                 {
                     Console.WriteLine(project);
+                }
+                break;
+            case "disk":
+                if (commandWords.Length == 1)
+                {
+                    Console.WriteLine("'disk' command needs a path");
+                    continue;
+                }
+
+                var location = string.Join(' ', commandWords.Skip(1));
+                var solutions = DiskService.GetSolutions(location);
+                foreach (var solution in solutions)
+                {
+                    Console.WriteLine($"SOLUTION: {solution.Name}");
+                    foreach (var project in solution.Projects)
+                    {
+                        Console.WriteLine($"PROJECT: {project.FileName} VERSION: {project.Version}");
+                    }
                 }
                 break;
             default:
