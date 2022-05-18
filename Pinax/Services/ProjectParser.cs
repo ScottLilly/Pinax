@@ -108,12 +108,54 @@ public static class ProjectParser
                     }
                 }
 
-                // Check for .NET 6 version
+                // Check for .NET Core or .NET 5/6/7 version
                 var targetFramework =
                     propertyGroup.Element("TargetFramework");
 
                 if (targetFramework?.Value != null)
                 {
+                    if (targetFramework.Value.StartsWith("netcoreapp1.0",
+                            StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        return Project.DotNetVersion.Core_1_0;
+                    }
+
+                    if (targetFramework.Value.StartsWith("netcoreapp1.1",
+                            StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        return Project.DotNetVersion.Core_1_1;
+                    }
+
+                    if (targetFramework.Value.StartsWith("netcoreapp2.0",
+                            StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        return Project.DotNetVersion.Core_2_0;
+                    }
+
+                    if (targetFramework.Value.StartsWith("netcoreapp2.1",
+                            StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        return Project.DotNetVersion.Core_2_1;
+                    }
+
+                    if (targetFramework.Value.StartsWith("netcoreapp2.2",
+                            StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        return Project.DotNetVersion.Core_2_2;
+                    }
+
+                    if (targetFramework.Value.StartsWith("netcoreapp3.0",
+                            StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        return Project.DotNetVersion.Core_3_0;
+                    }
+
+                    if (targetFramework.Value.StartsWith("netcoreapp3.1",
+                            StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        return Project.DotNetVersion.Core_3_1;
+                    }
+
                     if (targetFramework.Value.StartsWith("net5.0",
                             StringComparison.InvariantCultureIgnoreCase))
                     {
