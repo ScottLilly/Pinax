@@ -12,6 +12,7 @@ public static class ProjectParser
         Project project = new Project
         {
             FileName = filename,
+            DotNetType = GetDotNetType(projectFileText),
             Version = GetVersion(projectFileText)
         };
 
@@ -53,6 +54,61 @@ public static class ProjectParser
         }
 
         return packages;
+    }
+
+    private static Enums.DotNetType GetDotNetType(string projectFileText)
+    {
+        var root = XElement.Parse(projectFileText);
+        RemoveNamespacePrefix(root);
+        var propertyGroups = root.Elements("PropertyGroup").ToList();
+
+        if (propertyGroups.Any())
+        {
+            foreach (var propertyGroup in propertyGroups)
+            {
+                // Check for .NET Framework versions
+                var targetFrameworkVersion =
+                    propertyGroup.Element("TargetFrameworkVersion");
+
+                if (targetFrameworkVersion != null)
+                {
+                    return Enums.DotNetType.Framework;
+                }
+
+                // Check for .NET Core or .NET 5/6/7 version
+                var targetFramework =
+                    propertyGroup.Element("TargetFramework");
+
+                if (targetFramework?.Value != null)
+                {
+                    if (targetFramework.Value.StartsWith("netcore",
+                            StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        return Enums.DotNetType.Core;
+                    }
+
+                    if (targetFramework.Value.StartsWith("net5.0",
+                            StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        return Enums.DotNetType.DotNet;
+                    }
+
+                    if (targetFramework.Value.StartsWith("net6.0",
+                            StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        return Enums.DotNetType.DotNet;
+                    }
+
+                    if (targetFramework.Value.StartsWith("net7.0",
+                            StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        return Enums.DotNetType.DotNet;
+                    }
+                }
+            }
+        }
+
+        return Enums.DotNetType.Unknown;
     }
 
     private static Project.DotNetVersion GetVersion(string projectFileText)
