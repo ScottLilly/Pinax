@@ -19,48 +19,26 @@ do
         continue;
     }
 
-    if (command.Equals("!help"))
+    if (command.Equals("--help"))
     {
-        Console.WriteLine("!exit    Stops running Pinax");
+        Console.WriteLine("--exit    Stops running Pinax");
     }
     else
     {
-        var commandWords = command.Trim().Split(" ", StringSplitOptions.RemoveEmptyEntries);
+        var job = JobService.BuildJobFromCommand(command);
 
-        switch (commandWords[0].ToLowerInvariant())
+        if (job.IsValid)
         {
-            case "projects":
-                var projects = GitHubService.GetProjectFiles("scottlilly", "C#");
-                foreach (string project in projects)
-                {
-                    Console.WriteLine(project);
-                }
-                break;
-            case "disk":
-                if (commandWords.Length == 1)
-                {
-                    Console.WriteLine("'disk' command needs a path");
-                    continue;
-                }
+            job.Execute();
 
-                var location = string.Join(' ', commandWords.Skip(1));
-                var solutions = DiskService.GetSolutions(location);
-                foreach (var solution in solutions)
-                {
-                    Console.WriteLine($"SOLUTION: {solution.Name}");
-                    foreach (var project in solution.Projects)
-                    {
-                        Console.WriteLine($"PROJECT: {project.FileName} VERSION: {project.Version}");
-                    }
-                }
-                break;
-            default:
-                Console.WriteLine($"Unrecognized command: '{command}'");
-                break;
+            foreach (var result in job.Results)
+            {
+                Console.WriteLine(result);
+            }
         }
     }
 
-} while (!command.Equals("!exit", StringComparison.InvariantCultureIgnoreCase));
+} while (!command?.Equals("!exit", StringComparison.InvariantCultureIgnoreCase) ?? true);
 
 Librarian SetupPinaxInstance()
 {
