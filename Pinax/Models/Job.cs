@@ -28,7 +28,7 @@ public class Job
 
                     foreach (var project in solution.Projects)
                     {
-                        Results.Add($"PROJECT: {project.FileName} VERSION: {project.Version}");
+                        Results.Add($"PROJECT: {project.FileName} VERSION: {string.Join(';', project.ProjectTypes)}");
                     }
                 }
             }

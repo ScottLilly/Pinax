@@ -9,16 +9,95 @@ public static class ProjectParser
     {
         string projectFileText = string.Join(Environment.NewLine, lines);
 
+        var projectTypes = GetProjectTypes(projectFileText);
+
         Project project = new Project
         {
             FileName = filename,
-            DotNetType = GetDotNetType(projectFileText),
-            Version = GetVersion(projectFileText)
+            ProjectTypes = projectTypes
         };
 
         project.Packages.AddRange(GetPackages(projectFileText));
 
         return project;
+    }
+
+    private static List<ProjectType> GetProjectTypes(string projectFileText)
+    {
+        List<ProjectType> projectTypes = new List<ProjectType>();
+
+        var root = XElement.Parse(projectFileText);
+        RemoveNamespacePrefix(root);
+        var propertyGroups = root.Elements("PropertyGroup").ToList();
+
+        if (propertyGroups.Any())
+        {
+            foreach (var propertyGroup in propertyGroups)
+            {
+                // Check for .NET Framework versions
+                var targetFrameworkVersion =
+                    propertyGroup.Element("TargetFrameworkVersion");
+
+                if (targetFrameworkVersion != null &&
+                    targetFrameworkVersion?.Value != null)
+                {
+                    foreach (var version in targetFrameworkVersion.Value.Split(';', StringSplitOptions.TrimEntries))
+                    {
+                        string ver = "";
+
+                        foreach (char c in targetFrameworkVersion.Value)
+                        {
+                            if (char.IsDigit(c) || c == '.')
+                            {
+                                ver += c.ToString();
+                            }
+                        }
+
+                        projectTypes.Add(
+                            new ProjectType(
+                                Enums.DotNetType.Framework, Version.Parse(ver)));
+                    }
+                }
+
+                // Check for .NET Core/5/6/7 versions
+                var targetFramework =
+                    propertyGroup.Element("TargetFramework");
+
+                if (targetFramework != null &&
+                    targetFramework?.Value != null)
+                {
+                    foreach (var version in targetFramework.Value.Split(';', StringSplitOptions.TrimEntries))
+                    {
+                        var type = Enums.DotNetType.DotNet;
+
+                        if (targetFramework.Value.StartsWith("netcore",
+                                StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            type = Enums.DotNetType.Core;
+                        }
+                        else if (targetFramework.Value.StartsWith("standard",
+                                StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            type = Enums.DotNetType.Standard;
+                        }
+
+                        string ver = "";
+
+                        foreach (char c in version)
+                        {
+                            if (char.IsDigit(c) || c == '.')
+                            {
+                                ver += c.ToString();
+                            }
+                        }
+
+                        projectTypes.Add(new ProjectType(type, Version.Parse(ver)));
+                    }
+                }
+            }
+        }
+
+        return projectTypes;
     }
 
     private static List<Package> GetPackages(string projectFileText)
@@ -54,186 +133,6 @@ public static class ProjectParser
         }
 
         return packages;
-    }
-
-    private static Enums.DotNetType GetDotNetType(string projectFileText)
-    {
-        var root = XElement.Parse(projectFileText);
-        RemoveNamespacePrefix(root);
-        var propertyGroups = root.Elements("PropertyGroup").ToList();
-
-        if (propertyGroups.Any())
-        {
-            foreach (var propertyGroup in propertyGroups)
-            {
-                // Check for .NET Framework versions
-                var targetFrameworkVersion =
-                    propertyGroup.Element("TargetFrameworkVersion");
-
-                if (targetFrameworkVersion != null)
-                {
-                    return Enums.DotNetType.Framework;
-                }
-
-                // Check for .NET Core or .NET 5/6/7 version
-                var targetFramework =
-                    propertyGroup.Element("TargetFramework");
-
-                if (targetFramework?.Value != null)
-                {
-                    if (targetFramework.Value.StartsWith("netcore",
-                            StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        return Enums.DotNetType.Core;
-                    }
-
-                    if (targetFramework.Value.StartsWith("net5.0",
-                            StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        return Enums.DotNetType.DotNet;
-                    }
-
-                    if (targetFramework.Value.StartsWith("net6.0",
-                            StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        return Enums.DotNetType.DotNet;
-                    }
-
-                    if (targetFramework.Value.StartsWith("net7.0",
-                            StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        return Enums.DotNetType.DotNet;
-                    }
-                }
-            }
-        }
-
-        return Enums.DotNetType.Unknown;
-    }
-
-    private static Project.DotNetVersion GetVersion(string projectFileText)
-    {
-        var root = XElement.Parse(projectFileText);
-        RemoveNamespacePrefix(root);
-        var propertyGroups = root.Elements("PropertyGroup").ToList();
-
-        if (propertyGroups.Any())
-        {
-            foreach (var propertyGroup in propertyGroups)
-            {
-                // Check for .NET Framework versions
-                var targetFrameworkVersion =
-                    propertyGroup.Element("TargetFrameworkVersion");
-
-                if (targetFrameworkVersion != null)
-                {
-                    switch (targetFrameworkVersion.Value)
-                    {
-                        case "v1.0":
-                            return Project.DotNetVersion.Framework_1_0;
-                        case "v1.1":
-                            return Project.DotNetVersion.Framework_1_1;
-                        case "v2.0":
-                            return Project.DotNetVersion.Framework_2_0;
-                        case "v3.0":
-                            return Project.DotNetVersion.Framework_3_0;
-                        case "v3.5":
-                            return Project.DotNetVersion.Framework_3_5;
-                        case "v4.0":
-                            return Project.DotNetVersion.Framework_4_0;
-                        case "v4.5":
-                            return Project.DotNetVersion.Framework_4_5;
-                        case "v4.5.1":
-                            return Project.DotNetVersion.Framework_4_5_1;
-                        case "v4.5.2":
-                            return Project.DotNetVersion.Framework_4_5_2;
-                        case "v4.6":
-                            return Project.DotNetVersion.Framework_4_6;
-                        case "v4.6.1":
-                            return Project.DotNetVersion.Framework_4_6_1;
-                        case "v4.6.2":
-                            return Project.DotNetVersion.Framework_4_6_2;
-                        case "v4.7":
-                            return Project.DotNetVersion.Framework_4_7;
-                        case "v4.7.1":
-                            return Project.DotNetVersion.Framework_4_7_1;
-                        case "v4.7.2":
-                            return Project.DotNetVersion.Framework_4_7_2;
-                        case "v4.8":
-                            return Project.DotNetVersion.Framework_4_8;
-                    }
-                }
-
-                // Check for .NET Core or .NET 5/6/7 version
-                var targetFramework =
-                    propertyGroup.Element("TargetFramework");
-
-                if (targetFramework?.Value != null)
-                {
-                    if (targetFramework.Value.StartsWith("netcoreapp1.0",
-                            StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        return Project.DotNetVersion.Core_1_0;
-                    }
-
-                    if (targetFramework.Value.StartsWith("netcoreapp1.1",
-                            StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        return Project.DotNetVersion.Core_1_1;
-                    }
-
-                    if (targetFramework.Value.StartsWith("netcoreapp2.0",
-                            StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        return Project.DotNetVersion.Core_2_0;
-                    }
-
-                    if (targetFramework.Value.StartsWith("netcoreapp2.1",
-                            StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        return Project.DotNetVersion.Core_2_1;
-                    }
-
-                    if (targetFramework.Value.StartsWith("netcoreapp2.2",
-                            StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        return Project.DotNetVersion.Core_2_2;
-                    }
-
-                    if (targetFramework.Value.StartsWith("netcoreapp3.0",
-                            StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        return Project.DotNetVersion.Core_3_0;
-                    }
-
-                    if (targetFramework.Value.StartsWith("netcoreapp3.1",
-                            StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        return Project.DotNetVersion.Core_3_1;
-                    }
-
-                    if (targetFramework.Value.StartsWith("net5.0",
-                            StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        return Project.DotNetVersion.Net_5;
-                    }
-
-                    if (targetFramework.Value.StartsWith("net6.0",
-                            StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        return Project.DotNetVersion.Net_6;
-                    }
-
-                    if (targetFramework.Value.StartsWith("net7.0",
-                            StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        return Project.DotNetVersion.Net_7;
-                    }
-                }
-            }
-        }
-
-        return Project.DotNetVersion.Unknown;
     }
 
     private static void RemoveNamespacePrefix(XElement element)

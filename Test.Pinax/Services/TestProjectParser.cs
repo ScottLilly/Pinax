@@ -1,4 +1,6 @@
 using System.IO;
+using System.Linq;
+using Pinax;
 using Pinax.Models;
 using Pinax.Services;
 using Xunit;
@@ -15,7 +17,10 @@ public class TestProjectParser
 
         var project = ProjectParser.GetProject("SudokuSolver.csproj", projectFileText);
 
-        Assert.Equal(Project.DotNetVersion.Framework_4_5, project.Version);
+        Assert.NotNull(project.ProjectTypes
+            .FirstOrDefault(p => p.DotNetType == Enums.DotNetType.Framework &&
+                                 p.Version.Major == 4 &&
+                                 p.Version.Minor == 5));
     }
 
     [Fact]
@@ -26,7 +31,10 @@ public class TestProjectParser
 
         var project = ProjectParser.GetProject("DocVaultDAL.csproj", projectFileText);
 
-        Assert.Equal(Project.DotNetVersion.Net_5, project.Version);
+        Assert.NotNull(project.ProjectTypes
+            .FirstOrDefault(p => p.DotNetType == Enums.DotNetType.DotNet &&
+                                 p.Version.Major == 5 &&
+                                 p.Version.Minor == 0));
         Assert.Equal(4, project.Packages.Count);
     }
 
@@ -38,7 +46,10 @@ public class TestProjectParser
 
         var project = ProjectParser.GetProject("MicroSiteMakerServices.csproj", projectFileText);
 
-        Assert.Equal(Project.DotNetVersion.Net_6, project.Version);
+        Assert.NotNull(project.ProjectTypes
+            .FirstOrDefault(p => p.DotNetType == Enums.DotNetType.DotNet &&
+                                 p.Version.Major == 6 &&
+                                 p.Version.Minor == 0));
         Assert.Equal(1, project.Packages.Count);
         Assert.Equal("Markdig", project.Packages[0].Name);
         Assert.Equal("0.28.1", project.Packages[0].Version);
