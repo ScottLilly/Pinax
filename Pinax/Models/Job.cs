@@ -28,13 +28,19 @@ public class Job
 
                     foreach (var project in solution.Projects)
                     {
-                        Results.Add($"PROJECT: {project.FileName} VERSION: {string.Join(';', project.ProjectTypes)}");
+                        Results.Add($"PROJECT: {project.ShortName} VERSION: {string.Join(';', project.ProjectTypes)}");
                     }
                 }
             }
             else
             {
                 // GitHub searching
+                var projects = GitHubService.GetProjectFiles(location, "C#");
+
+                foreach (string project in projects)
+                {
+                    Results.Add($"PROJECT: {project}");
+                }
             }
         }
     }
