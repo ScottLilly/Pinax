@@ -22,13 +22,13 @@ public class Job
             {
                 var solutions = DiskService.GetSolutions(location);
 
-                foreach (var solution in solutions)
+                foreach (Solution solution in solutions)
                 {
                     Results.Add($"SOLUTION: {solution.Name}");
 
-                    foreach (var project in solution.Projects)
+                    foreach (Project project in solution.Projects)
                     {
-                        Results.Add($"PROJECT: {project.ShortName} VERSION: {string.Join(';', project.ProjectTypes)}");
+                        Results.Add($"PROJECT: {project.ShortName} [{string.Join(';', project.ProjectTypes)}]");
                     }
                 }
             }

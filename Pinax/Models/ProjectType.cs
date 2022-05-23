@@ -13,6 +13,6 @@ public class ProjectType
 
     public override string ToString()
     {
-        return $"{DotNetType} {Version}";
+        return $"{DotNetType.GetEnumDisplayName()} {Version}";
     }
 }
