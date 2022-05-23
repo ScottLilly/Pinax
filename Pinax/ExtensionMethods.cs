@@ -1,4 +1,7 @@
-﻿namespace Pinax;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Reflection;
+
+namespace Pinax;
 
 public static class ExtensionMethods
 {
@@ -22,5 +25,13 @@ public static class ExtensionMethods
         return func == null
             ? !elements.Any()
             : !elements.Any(func.Invoke);
+    }
+
+    public static string GetEnumDisplayName(this Enum enumType)
+    {
+        return enumType.GetType().GetMember(enumType.ToString())
+            .First()
+            .GetCustomAttribute<DisplayAttribute>()
+            ?.Name ?? enumType.ToString();
     }
 }

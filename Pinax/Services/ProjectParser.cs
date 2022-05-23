@@ -24,76 +24,78 @@ public static class ProjectParser
 
     private static List<ProjectType> GetProjectTypes(string projectFileText)
     {
-        List<ProjectType> projectTypes = new List<ProjectType>();
+        var projectTypes = new List<ProjectType>();
 
-        var root = XElement.Parse(projectFileText);
+        XElement root = XElement.Parse(projectFileText);
         RemoveNamespacePrefix(root);
         var propertyGroups = root.Elements("PropertyGroup").ToList();
 
-        if (propertyGroups.Any())
+        foreach (XElement propertyGroup in propertyGroups)
         {
-            foreach (var propertyGroup in propertyGroups)
+            // Check for .NET Framework versions
+            projectTypes.AddRange(
+                GetProjectTypes(propertyGroup.Element("TargetFrameworkVersion")));
+
+            // Check for .NET Core/5/6/7 versions
+            projectTypes.AddRange(
+                GetProjectTypes(propertyGroup.Element("TargetFramework")));
+        }
+
+        return projectTypes;
+    }
+
+    private static Enums.DotNetType GetDotNetType(string version)
+    {
+        if (version.StartsWith("v",
+                StringComparison.InvariantCultureIgnoreCase))
+        {
+            return Enums.DotNetType.Framework;
+        }
+
+        if (version.StartsWith("netcore",
+                StringComparison.InvariantCultureIgnoreCase))
+        {
+            return Enums.DotNetType.Core;
+        }
+
+        if (version.StartsWith("standard",
+                StringComparison.InvariantCultureIgnoreCase))
+        {
+            return Enums.DotNetType.Standard;
+        }
+
+        if (version.StartsWith("net",
+                StringComparison.InvariantCultureIgnoreCase))
+        {
+            return Enums.DotNetType.DotNet;
+        }
+
+        return Enums.DotNetType.Unknown;
+    }
+
+    private static Version GetVersionFromString(string version)
+    {
+        string ver =
+            version.Where(c => char.IsDigit(c) || c == '.')
+                .Aggregate("", (current, c) => current + c);
+
+        return Version.Parse(ver);
+    }
+
+    private static List<ProjectType> GetProjectTypes(XElement? target)
+    {
+        List<ProjectType> projectTypes =
+            new List<ProjectType>();
+
+        if (target != null &&
+            target?.Value != null)
+        {
+            foreach (var version in target.Value.Split(';'))
             {
-                // Check for .NET Framework versions
-                var targetFrameworkVersion =
-                    propertyGroup.Element("TargetFrameworkVersion");
-
-                if (targetFrameworkVersion != null &&
-                    targetFrameworkVersion?.Value != null)
-                {
-                    foreach (var version in targetFrameworkVersion.Value.Split(';', StringSplitOptions.TrimEntries))
-                    {
-                        string ver = "";
-
-                        foreach (char c in targetFrameworkVersion.Value)
-                        {
-                            if (char.IsDigit(c) || c == '.')
-                            {
-                                ver += c.ToString();
-                            }
-                        }
-
-                        projectTypes.Add(
-                            new ProjectType(
-                                Enums.DotNetType.Framework, Version.Parse(ver)));
-                    }
-                }
-
-                // Check for .NET Core/5/6/7 versions
-                var targetFramework =
-                    propertyGroup.Element("TargetFramework");
-
-                if (targetFramework != null &&
-                    targetFramework?.Value != null)
-                {
-                    foreach (var version in targetFramework.Value.Split(';', StringSplitOptions.TrimEntries))
-                    {
-                        var type = Enums.DotNetType.DotNet;
-
-                        if (targetFramework.Value.StartsWith("netcore",
-                                StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            type = Enums.DotNetType.Core;
-                        }
-                        else if (targetFramework.Value.StartsWith("standard",
-                                StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            type = Enums.DotNetType.Standard;
-                        }
-
-                        string ver = "";
-
-                        foreach (char c in version)
-                        {
-                            if (char.IsDigit(c) || c == '.')
-                            {
-                                ver += c.ToString();
-                            }
-                        }
-
-                        projectTypes.Add(new ProjectType(type, Version.Parse(ver)));
-                    }
-                }
+                projectTypes.Add(
+                    new ProjectType(
+                        GetDotNetType(version),
+                        GetVersionFromString(version)));
             }
         }
 
