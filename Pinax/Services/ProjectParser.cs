@@ -17,7 +17,7 @@ public static class ProjectParser
             ProjectTypes = projectTypes
         };
 
-        project.Packages.AddRange(GetPackages(projectFileText));
+        project.Packages.AddRange(GetPackages(filename, projectFileText));
 
         return project;
     }
@@ -102,7 +102,7 @@ public static class ProjectParser
         return projectTypes;
     }
 
-    private static List<Package> GetPackages(string projectFileText)
+    private static List<Package> GetPackages(string projectFileName, string projectFileText)
     {
         var root = XElement.Parse(projectFileText);
         RemoveNamespacePrefix(root);
@@ -128,9 +128,44 @@ public static class ProjectParser
                     packages.Add(new Package
                     {
                         Name = packageReference.Attributes("Include").First().Value,
-                        Version = packageReference.Attributes("Version").First().Value
+                        Version = Version.Parse(packageReference.Attributes("Version").First().Value)
                     });
                 }
+            }
+        }
+
+        // For older version of Visual Studio, with packages.config files
+        packages.AddRange(GetPackagesFromConfig(projectFileName));
+
+        return packages;
+    }
+
+    private static List<Package> GetPackagesFromConfig(string projectFileName)
+    {
+        List<Package> packages = new List<Package>();
+
+        FileInfo projectFile = new FileInfo(projectFileName);
+
+        string packageFileName =
+            Path.Combine(projectFile.DirectoryName, "packages.config");
+
+        if (File.Exists(packageFileName))
+        {
+            var root = XElement.Parse(File.ReadAllText(packageFileName));
+            RemoveNamespacePrefix(root);
+
+            var packageElements = root.Elements("package").ToList();
+
+            foreach (XElement packageElement in packageElements)
+            {
+                var newPackage = new Package
+                {
+                    Name = packageElement.Attributes("id").First().Value,
+                    Version = Version.Parse(packageElement.Attributes("version").First().Value),
+                    TargetFramework = packageElement.Attributes("targetFramework").First().Value
+                };
+
+                packages.Add(newPackage);
             }
         }
 

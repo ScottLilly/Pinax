@@ -28,7 +28,12 @@ public class Job
 
                     foreach (Project project in solution.Projects)
                     {
-                        Results.Add($"PROJECT: {project.ShortName} [{string.Join(';', project.ProjectTypes)}]");
+                        Results.Add($"\tPROJECT: {project.ShortName} [{string.Join(';', project.ProjectTypes)}]");
+
+                        foreach (Package package in project.Packages)
+                        {
+                            Results.Add($"\t\tPACKAGE: {package.Name} {package.Version}");
+                        }
                     }
                 }
             }
