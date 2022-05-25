@@ -32,6 +32,10 @@ public static class JobService
                 {
                     job.Locations.Add(val.Trim());
                 }
+                else if (key.Matches("exclude"))
+                {
+                    job.ExcludedLocations.Add(val.Trim());
+                }
             }
         }
 
