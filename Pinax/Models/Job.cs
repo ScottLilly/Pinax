@@ -8,6 +8,8 @@ public class Job
     public Enums.Source LocationType { get; set; }
     public List<string> Locations { get; } =
         new List<string>();
+    public List<string> ExcludedLocations { get; } =
+        new List<string>();
 
     public List<string> ValidationErrors { get; }=
         new List<string>();
@@ -24,6 +26,12 @@ public class Job
 
                 foreach (Solution solution in solutions)
                 {
+                    if (ExcludedLocations
+                        .Any(x => solution.Name.StartsWith(x, StringComparison.InvariantCultureIgnoreCase)))
+                    {
+                        continue;
+                    }
+
                     Results.Add($"SOLUTION: {solution.Name}");
 
                     foreach (Project project in solution.Projects)
