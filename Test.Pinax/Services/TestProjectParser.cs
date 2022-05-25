@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 using Pinax;
@@ -52,6 +53,6 @@ public class TestProjectParser
                                  p.Version.Minor == 0));
         Assert.Equal(1, project.Packages.Count);
         Assert.Equal("Markdig", project.Packages[0].Name);
-        Assert.Equal("0.28.1", project.Packages[0].Version);
+        Assert.Equal(new Version(0, 28,1), project.Packages[0].Version);
     }
 }
