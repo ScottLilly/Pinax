@@ -53,6 +53,8 @@ Librarian SetupPinaxInstance()
 
     PinaxConfiguration pinaxConfiguration =
         PersistenceService.GetPinaxConfiguration();
+    DotNetVersions latestDotNetVersions =
+        PersistenceService.GetLatestDotNetVersions();
 
     GitHubService.SetToken(userSecretsToken);
 
