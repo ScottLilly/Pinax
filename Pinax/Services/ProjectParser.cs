@@ -161,8 +161,7 @@ public static class ProjectParser
                 var newPackage = new Package
                 {
                     Name = packageElement.Attributes("id").First().Value,
-                    Version = Version.Parse(packageElement.Attributes("version").First().Value),
-                    TargetFramework = packageElement.Attributes("targetFramework").First().Value
+                    Version = Version.Parse(packageElement.Attributes("version").First().Value)
                 };
 
                 packages.Add(newPackage);
