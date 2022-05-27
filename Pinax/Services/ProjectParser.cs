@@ -8,19 +8,22 @@ namespace Pinax.Services;
 
 public static class ProjectParser
 {
-    public static DotNetProject GetProject(string filename, IEnumerable<string> lines)
+    public static DotNetProject GetProject(string filename,
+        IEnumerable<string> lines, DotNetVersions latestVersions)
     {
         string projectFileText = string.Join(Environment.NewLine, lines);
 
         var projectTypes = GetProjectTypes(projectFileText);
 
-        var project = new DotNetProject(filename);
+        var project = new DotNetProject(filename, latestVersions);
 
         project.ProjectTypes.AddRange(projectTypes);
         project.Packages.AddRange(GetPackages(filename, projectFileText));
 
         return project;
     }
+
+    #region Private methods
 
     private static List<DotNetProjectType> GetProjectTypes(string projectFileText)
     {
@@ -73,13 +76,19 @@ public static class ProjectParser
         return Enums.DotNetType.Unknown;
     }
 
-    private static Version GetVersionFromString(string version)
+    private static Version GetVersionFromString(string versionString)
     {
-        string ver =
-            version.Where(c => char.IsDigit(c) || c == '.')
+        string cleanedVersion =
+            versionString.Where(c => char.IsDigit(c) || c == '.')
                 .Aggregate("", (current, c) => current + c);
 
-        return Version.Parse(ver);
+        Version version = Version.Parse(cleanedVersion);
+
+        return new Version(
+            version.Major == -1 ? 0 : version.Major, 
+            version.Minor == -1 ? 0 : version.Minor,
+            version.Build == -1 ? 0 : version.Build,
+            version.Revision == -1 ? 0 : version.Revision);
     }
 
     private static List<DotNetProjectType> GetProjectTypes(XElement? target)
@@ -164,4 +173,6 @@ public static class ProjectParser
 
         return packages;
     }
+
+    #endregion
 }

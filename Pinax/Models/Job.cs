@@ -55,43 +55,7 @@ public class Job
 
             foreach (DotNetProject project in solution.Projects)
             {
-                bool isOutdated = false;
-
-                if (project.ProjectTypes.Any(p => p.Type == Enums.DotNetType.Standard) &&
-                    project.ProjectTypes
-                        .Where(p => p.Type == Enums.DotNetType.Standard)
-                        .None(p => p.Version.Major == _latestDotNetVersions.Standard.Major &&
-                                   p.Version.Minor == _latestDotNetVersions.Standard.Minor))
-                {
-                    isOutdated = true;
-                }
-
-                if (project.ProjectTypes.Any(p => p.Type == Enums.DotNetType.Core) &&
-                    project.ProjectTypes
-                        .Where(p => p.Type == Enums.DotNetType.Core)
-                        .None(p => p.Version.Major == _latestDotNetVersions.Core.Major &&
-                                   p.Version.Minor == _latestDotNetVersions.Core.Minor))
-                {
-                    isOutdated = true;
-                }
-
-                if (project.ProjectTypes.Any(p => p.Type == Enums.DotNetType.Framework) &&
-                    project.ProjectTypes
-                        .Where(p => p.Type == Enums.DotNetType.Framework)
-                        .None(p => p.Version.Major == _latestDotNetVersions.Framework.Major &&
-                                   p.Version.Minor == _latestDotNetVersions.Framework.Minor))
-                {
-                    isOutdated = true;
-                }
-
-                if (project.ProjectTypes.Any(p => p.Type == Enums.DotNetType.DotNet) &&
-                    project.ProjectTypes
-                        .Where(p => p.Type == Enums.DotNetType.DotNet)
-                        .None(p => p.Version.Major == _latestDotNetVersions.DotNet.Major &&
-                                   p.Version.Minor == _latestDotNetVersions.DotNet.Minor))
-                {
-                    isOutdated = true;
-                }
+                bool isOutdated = project.IsOutdated(_warningLevel);
 
                 string outdatedFlag = isOutdated ? "*" : "";
 
@@ -126,7 +90,7 @@ public class Job
     private void PopulateSolutionsFromDisk(string location)
     {
         Solutions =
-            DiskService.GetSolutions(location)
+            DiskService.GetSolutions(location, _latestDotNetVersions)
                 .Where(s =>
                     _excludedLocations.None(e =>
                         s.Name.StartsWith(e, StringComparison.InvariantCultureIgnoreCase)))
