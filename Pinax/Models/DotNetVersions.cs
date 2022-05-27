@@ -2,10 +2,10 @@
 
 public class DotNetVersions
 {
-    public string Standard { get; set; }
-    public string Framework { get; set; }
-    public string Core { get; set; }
-    public string DotNet { get; set; }
+    public Version Standard { get; set; }
+    public Version Framework { get; set; }
+    public Version Core { get; set; }
+    public Version DotNet { get; set; }
     //public class Rootobject
     //{
     //}

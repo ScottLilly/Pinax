@@ -6,6 +6,8 @@ Console.WriteLine("Pinax - GitHub language and library version monitoring tool")
 Console.WriteLine("Type '!help' to see available commands");
 
 Librarian librarian = SetupPinaxInstance();
+DotNetVersions latestDotNetVersions =
+    PersistenceService.GetLatestDotNetVersions();
 
 // Wait for user commands
 string? command = "";
@@ -25,7 +27,8 @@ do
     }
     else
     {
-        var job = JobService.BuildJobFromCommand(command);
+        var job =
+            JobService.BuildJobFromCommand(command, latestDotNetVersions);
 
         if (job.IsValid)
         {
@@ -53,8 +56,6 @@ Librarian SetupPinaxInstance()
 
     PinaxConfiguration pinaxConfiguration =
         PersistenceService.GetPinaxConfiguration();
-    DotNetVersions latestDotNetVersions =
-        PersistenceService.GetLatestDotNetVersions();
 
     GitHubService.SetToken(userSecretsToken);
 

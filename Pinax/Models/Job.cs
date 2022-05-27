@@ -4,6 +4,8 @@ namespace Pinax.Models;
 
 public class Job
 {
+    private readonly DotNetVersions _latestDotNetVersions;
+
     public bool IsValid => ValidationErrors.None();
     public Enums.Source LocationType { get; set; }
     public List<string> Locations { get; } =
@@ -15,6 +17,11 @@ public class Job
         new List<string>();
     public List<string> Results { get; } =
         new List<string>();
+
+    public Job(DotNetVersions latestDotNetVersions)
+    {
+        _latestDotNetVersions = latestDotNetVersions;
+    }
 
     public void Execute()
     {
@@ -36,7 +43,47 @@ public class Job
 
                     foreach (Project project in solution.Projects)
                     {
-                        Results.Add($"\tPROJECT: {project.ShortName} [{string.Join(';', project.ProjectTypes)}]");
+                        bool isOutdated = false;
+
+                        if (project.ProjectTypes.Any(p => p.DotNetType == Enums.DotNetType.Standard) &&
+                            project.ProjectTypes
+                                .Where(p => p.DotNetType == Enums.DotNetType.Standard)
+                                .None(p => p.Version.Major == _latestDotNetVersions.Standard.Major &&
+                                           p.Version.Minor == _latestDotNetVersions.Standard.Minor))
+                        {
+                            isOutdated = true;
+                        }
+
+                        if (project.ProjectTypes.Any(p => p.DotNetType == Enums.DotNetType.Core) &&
+                            project.ProjectTypes
+                                .Where(p => p.DotNetType == Enums.DotNetType.Core)
+                                .None(p => p.Version.Major == _latestDotNetVersions.Core.Major &&
+                                           p.Version.Minor == _latestDotNetVersions.Core.Minor))
+                        {
+                            isOutdated = true;
+                        }
+
+                        if (project.ProjectTypes.Any(p => p.DotNetType == Enums.DotNetType.Framework) &&
+                            project.ProjectTypes
+                                .Where(p => p.DotNetType == Enums.DotNetType.Framework)
+                                .None(p => p.Version.Major == _latestDotNetVersions.Framework.Major &&
+                                           p.Version.Minor == _latestDotNetVersions.Framework.Minor))
+                        {
+                            isOutdated = true;
+                        }
+
+                        if (project.ProjectTypes.Any(p => p.DotNetType == Enums.DotNetType.DotNet) &&
+                            project.ProjectTypes
+                                .Where(p => p.DotNetType == Enums.DotNetType.DotNet)
+                                .None(p => p.Version.Major == _latestDotNetVersions.DotNet.Major &&
+                                           p.Version.Minor == _latestDotNetVersions.DotNet.Minor))
+                        {
+                            isOutdated = true;
+                        }
+
+                        string outdatedFlag = isOutdated ? "*" : "";
+
+                        Results.Add($"{outdatedFlag}\tPROJECT: {project.ShortName} [{string.Join(';', project.ProjectTypes)}]");
 
                         foreach (Package package in project.Packages)
                         {
