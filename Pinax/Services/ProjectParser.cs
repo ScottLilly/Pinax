@@ -1,5 +1,6 @@
 ﻿using System.Xml.Linq;
 using Pinax.Models;
+using Pinax.Models.ProjectTypes;
 
 namespace Pinax.Services;
 
@@ -11,20 +12,17 @@ public static class ProjectParser
 
         var projectTypes = GetProjectTypes(projectFileText);
 
-        Project project = new Project
-        {
-            FileName = filename,
-            ProjectTypes = projectTypes
-        };
+        Project project = new Project(filename);
 
+        project.ProjectTypes.AddRange(projectTypes);
         project.Packages.AddRange(GetPackages(filename, projectFileText));
 
         return project;
     }
 
-    private static List<ProjectType> GetProjectTypes(string projectFileText)
+    private static List<DotNetProjectType> GetProjectTypes(string projectFileText)
     {
-        var projectTypes = new List<ProjectType>();
+        var projectTypes = new List<DotNetProjectType>();
 
         XElement root = XElement.Parse(projectFileText);
         RemoveNamespacePrefix(root);
@@ -82,10 +80,10 @@ public static class ProjectParser
         return Version.Parse(ver);
     }
 
-    private static List<ProjectType> GetProjectTypes(XElement? target)
+    private static List<DotNetProjectType> GetProjectTypes(XElement? target)
     {
-        List<ProjectType> projectTypes =
-            new List<ProjectType>();
+        List<DotNetProjectType> projectTypes =
+            new List<DotNetProjectType>();
 
         if (target != null &&
             target?.Value != null)
@@ -93,7 +91,7 @@ public static class ProjectParser
             foreach (var version in target.Value.Split(';'))
             {
                 projectTypes.Add(
-                    new ProjectType(
+                    new DotNetProjectType(
                         GetDotNetType(version),
                         GetVersionFromString(version)));
             }

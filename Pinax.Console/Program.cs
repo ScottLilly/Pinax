@@ -5,9 +5,10 @@ using Pinax.Services;
 Console.WriteLine("Pinax - GitHub language and library version monitoring tool");
 Console.WriteLine("Type '!help' to see available commands");
 
-Librarian librarian = SetupPinaxInstance();
 DotNetVersions latestDotNetVersions =
     PersistenceService.GetLatestDotNetVersions();
+
+SetupPinaxInstance();
 
 // Wait for user commands
 string? command = "";
@@ -43,7 +44,7 @@ do
 
 } while (!command?.Equals("!exit", StringComparison.InvariantCultureIgnoreCase) ?? true);
 
-Librarian SetupPinaxInstance()
+void SetupPinaxInstance()
 {
     var builder = new ConfigurationBuilder()
         .SetBasePath(Directory.GetCurrentDirectory())
@@ -54,10 +55,5 @@ Librarian SetupPinaxInstance()
     string userSecretsToken =
         configuration.AsEnumerable().First(c => c.Key == "GitHubToken").Value;
 
-    PinaxConfiguration pinaxConfiguration =
-        PersistenceService.GetPinaxConfiguration();
-
     GitHubService.SetToken(userSecretsToken);
-
-    return new Librarian(pinaxConfiguration, userSecretsToken);
 }

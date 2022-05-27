@@ -19,7 +19,7 @@ public class TestProjectParser
         var project = ProjectParser.GetProject("SudokuSolver.csproj", projectFileText);
 
         Assert.NotNull(project.ProjectTypes
-            .FirstOrDefault(p => p.DotNetType == Enums.DotNetType.Framework &&
+            .FirstOrDefault(p => p.Type == Enums.DotNetType.Framework &&
                                  p.Version.Major == 4 &&
                                  p.Version.Minor == 5));
     }
@@ -33,7 +33,7 @@ public class TestProjectParser
         var project = ProjectParser.GetProject("DocVaultDAL.csproj", projectFileText);
 
         Assert.NotNull(project.ProjectTypes
-            .FirstOrDefault(p => p.DotNetType == Enums.DotNetType.DotNet &&
+            .FirstOrDefault(p => p.Type == Enums.DotNetType.DotNet &&
                                  p.Version.Major == 5 &&
                                  p.Version.Minor == 0));
         Assert.Equal(4, project.Packages.Count);
@@ -48,7 +48,7 @@ public class TestProjectParser
         var project = ProjectParser.GetProject("MicroSiteMakerServices.csproj", projectFileText);
 
         Assert.NotNull(project.ProjectTypes
-            .FirstOrDefault(p => p.DotNetType == Enums.DotNetType.DotNet &&
+            .FirstOrDefault(p => p.Type == Enums.DotNetType.DotNet &&
                                  p.Version.Major == 6 &&
                                  p.Version.Minor == 0));
         Assert.Equal(1, project.Packages.Count);
