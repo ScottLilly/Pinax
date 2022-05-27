@@ -4,9 +4,10 @@ namespace Pinax.Services;
 
 public static class JobService
 {
-    public static Job BuildJobFromCommand(string command)
+    public static Job BuildJobFromCommand(string command,
+        DotNetVersions dotNetVersions)
     {
-        var job = new Job();
+        var job = new Job(dotNetVersions);
 
         var commands =
             command.Trim().Split("--", StringSplitOptions.RemoveEmptyEntries);
