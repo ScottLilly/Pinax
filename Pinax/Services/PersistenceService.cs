@@ -5,15 +5,7 @@ namespace Pinax.Services;
 
 public static class PersistenceService
 {
-    private const string PINAX_CONFIGURATION_FILE_NAME = "appsettings.json";
-    private const string LATEST_DOT_NET_VERSIONS_FILE_NAME = "DotNetVersions.json";
-
-    public static PinaxConfiguration GetPinaxConfiguration()
-    {
-        return File.Exists(PINAX_CONFIGURATION_FILE_NAME)
-            ? JsonConvert.DeserializeObject<PinaxConfiguration>(File.ReadAllText(PINAX_CONFIGURATION_FILE_NAME))
-            : new PinaxConfiguration();
-    }
+    private const string LATEST_DOT_NET_VERSIONS_FILE_NAME = "LatestDotNetVersions.json";
 
     public static DotNetVersions GetLatestDotNetVersions()
     {
