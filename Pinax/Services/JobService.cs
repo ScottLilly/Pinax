@@ -7,10 +7,13 @@ public static class JobService
     public static Job BuildJobFromCommand(string command,
         DotNetVersions dotNetVersions)
     {
-        var job = new Job(dotNetVersions);
-
         var commands =
             command.Trim().Split("--", StringSplitOptions.RemoveEmptyEntries);
+
+        Enums.Source source = Enums.Source.Unknown;
+        List<string> includedLocations = new List<string>();
+        List<string> excludedLocations = new List<string>();
+        Enums.WarningLevel warningLevel = Enums.WarningLevel.Minor;
 
         foreach (var cmd in commands)
         {
@@ -32,16 +35,34 @@ public static class JobService
             // Handle key/value parameters
             if (key.Matches("source"))
             {
-                job.LocationType = Enum.Parse<Enums.Source>(val, true);
+                source = Enum.Parse<Enums.Source>(val, true);
             }
             else if (key.Matches("location"))
             {
-                job.Locations.Add(val.Trim());
+                includedLocations.Add(val.Trim());
             }
             else if (key.Matches("exclude"))
             {
-                job.ExcludedLocations.Add(val.Trim());
+                excludedLocations.Add(val.Trim());
             }
+            else if (key.Matches("warning"))
+            {
+                warningLevel = Enum.Parse<Enums.WarningLevel>(val, true);
+            }
+        }
+
+        // TODO: Handle bad parameters
+
+        var job = new Job(source, dotNetVersions, warningLevel);
+
+        foreach (string location in includedLocations)
+        {
+            job.AddIncludedLocation(location);
+        }
+
+        foreach (string location in excludedLocations)
+        {
+            job.AddExcludedLocation(location);
         }
 
         return job;
