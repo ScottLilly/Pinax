@@ -1,24 +1,25 @@
 ﻿using Pinax.Models;
+using Pinax.Models.Projects;
 
 namespace Pinax.Services;
 
 public static class DiskService
 {
-    public static List<Solution> GetSolutions(string rootDirectory)
+    public static List<Solution> GetSolutions(string rootDirectory, DotNetVersions latestVersions)
     {
         if (!Directory.Exists(rootDirectory))
         {
             Console.WriteLine($"Directory '{rootDirectory}' does not exist");
         }
 
-        List<Solution> solutions = new List<Solution>();
+        var solutions = new List<Solution>();
 
         var solutionFiles =
             Directory.GetFiles(rootDirectory, "*.sln", SearchOption.AllDirectories);
 
         foreach (string solutionFile in solutionFiles)
         {
-            FileInfo solutionFileInfo = new FileInfo(solutionFile);
+            var solutionFileInfo = new FileInfo(solutionFile);
 
             var solution = new Solution
             {
@@ -26,12 +27,14 @@ public static class DiskService
             };
 
             var projectFiles =
-                Directory.GetFiles(solutionFileInfo.DirectoryName, "*.csproj", SearchOption.AllDirectories);
+                Directory.GetFiles(solutionFileInfo.DirectoryName,
+                    "*.csproj", SearchOption.AllDirectories);
 
             foreach (var projectFile in projectFiles)
             {
-                var project = 
-                    ProjectParser.GetProject(projectFile, File.ReadAllLines(projectFile));
+                DotNetProject project = 
+                    ProjectParser.GetProject(projectFile, 
+                        File.ReadAllLines(projectFile), latestVersions);
 
                 solution.Projects.Add(project);
             }
