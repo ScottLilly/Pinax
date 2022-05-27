@@ -6,7 +6,4 @@ public class DotNetVersions
     public Version Framework { get; set; }
     public Version Core { get; set; }
     public Version DotNet { get; set; }
-    //public class Rootobject
-    //{
-    //}
 }

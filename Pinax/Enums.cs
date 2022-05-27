@@ -19,7 +19,17 @@ public static class Enums
 
     public enum Source
     {
+        Unknown,
         Disk,
         GitHub
+    }
+
+    public enum WarningLevel
+    {
+        None,
+        Major,
+        Minor,
+        Build,
+        Revision
     }
 }

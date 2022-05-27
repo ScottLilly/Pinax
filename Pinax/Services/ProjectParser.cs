@@ -1,18 +1,20 @@
 ﻿using System.Xml.Linq;
+using Pinax.Common;
 using Pinax.Models;
+using Pinax.Models.Projects;
 using Pinax.Models.ProjectTypes;
 
 namespace Pinax.Services;
 
 public static class ProjectParser
 {
-    public static Project GetProject(string filename, IEnumerable<string> lines)
+    public static DotNetProject GetProject(string filename, IEnumerable<string> lines)
     {
         string projectFileText = string.Join(Environment.NewLine, lines);
 
         var projectTypes = GetProjectTypes(projectFileText);
 
-        Project project = new Project(filename);
+        var project = new DotNetProject(filename);
 
         project.ProjectTypes.AddRange(projectTypes);
         project.Packages.AddRange(GetPackages(filename, projectFileText));
@@ -25,7 +27,7 @@ public static class ProjectParser
         var projectTypes = new List<DotNetProjectType>();
 
         XElement root = XElement.Parse(projectFileText);
-        RemoveNamespacePrefix(root);
+        XmlFunctions.RemoveNamespacePrefix(root);
         var propertyGroups = root.Elements("PropertyGroup").ToList();
 
         foreach (XElement propertyGroup in propertyGroups)
@@ -102,13 +104,13 @@ public static class ProjectParser
 
     private static List<Package> GetPackages(string projectFileName, string projectFileText)
     {
-        var root = XElement.Parse(projectFileText);
-        RemoveNamespacePrefix(root);
+        XElement root = XElement.Parse(projectFileText);
+        XmlFunctions.RemoveNamespacePrefix(root);
         var itemGroups = root.Elements("ItemGroup").ToList();
 
         var packages = new List<Package>();
 
-        foreach (var itemGroup in itemGroups)
+        foreach (XElement itemGroup in itemGroups)
         {
             var packageReferences =
                 itemGroup.Elements("PackageReference").ToList();
@@ -118,39 +120,33 @@ public static class ProjectParser
                 continue;
             }
 
-            foreach (var packageReference in packageReferences)
+            foreach (XElement packageReference in packageReferences)
             {
-                if (packageReference.Attributes("Include").Any() &&
-                    packageReference.Attributes("Version").Any())
+                packages.Add(new Package
                 {
-                    packages.Add(new Package
-                    {
-                        Name = packageReference.Attributes("Include").First().Value,
-                        Version = Version.Parse(packageReference.Attributes("Version").First().Value)
-                    });
-                }
+                    Name = packageReference.Attributes("Include").First().Value,
+                    Version = Version.Parse(packageReference.Attributes("Version").First().Value)
+                });
             }
         }
 
         // For older version of Visual Studio, with packages.config files
-        packages.AddRange(GetPackagesFromConfig(projectFileName));
+        packages.AddRange(PackagesFromPackagesConfig(projectFileName));
 
         return packages;
     }
 
-    private static List<Package> GetPackagesFromConfig(string projectFileName)
+    private static List<Package> PackagesFromPackagesConfig(string projectFileName)
     {
-        List<Package> packages = new List<Package>();
-
-        FileInfo projectFile = new FileInfo(projectFileName);
-
+        var packages = new List<Package>();
+        var projectFile = new FileInfo(projectFileName);
         string packageFileName =
             Path.Combine(projectFile.DirectoryName, "packages.config");
 
         if (File.Exists(packageFileName))
         {
-            var root = XElement.Parse(File.ReadAllText(packageFileName));
-            RemoveNamespacePrefix(root);
+            XElement root = XElement.Parse(File.ReadAllText(packageFileName));
+            XmlFunctions.RemoveNamespacePrefix(root);
 
             var packageElements = root.Elements("package").ToList();
 
@@ -167,24 +163,5 @@ public static class ProjectParser
         }
 
         return packages;
-    }
-
-    private static void RemoveNamespacePrefix(XElement element)
-    {
-        element.Name = element.Name.LocalName;
-
-        var attributes = element.Attributes().ToArray();
-
-        element.RemoveAttributes();
-
-        foreach (var attribute in attributes)
-        {
-            element.Add(new XAttribute(attribute.Name.LocalName, attribute.Value));
-        }
-
-        foreach (var child in element.Descendants())
-        {
-            RemoveNamespacePrefix(child);
-        }
     }
 }
