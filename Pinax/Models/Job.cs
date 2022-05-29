@@ -8,11 +8,17 @@ public class Job
     private readonly Enums.Source _fileSource;
     private readonly DotNetVersions _latestDotNetVersions;
     private readonly Enums.WarningLevel _warningLevel;
+    private readonly bool _onlyShowOutdated;
     private readonly List<string> _includedLocations = new();
     private readonly List<string> _excludedLocations = new();
 
-    public List<Solution> Solutions =
-        new List<Solution>();
+    private readonly List<Solution> _solutions = new();
+
+    private IEnumerable<Solution> SolutionsToDisplay =>
+        _onlyShowOutdated
+            ? _solutions.Where(s => s.HasOutdatedSolutions(_warningLevel))
+            : _solutions;
+
     public List<string> Results { get; } =
         new List<string>();
     public List<string> ValidationErrors { get; } =
@@ -22,11 +28,13 @@ public class Job
 
     public Job(Enums.Source fileSource,
         DotNetVersions latestDotNetVersions,
-        Enums.WarningLevel warningLevel = Enums.WarningLevel.None)
+        Enums.WarningLevel warningLevel,
+        bool onlyShowOutdated)
     {
         _fileSource = fileSource;
         _latestDotNetVersions = latestDotNetVersions;
         _warningLevel = warningLevel;
+        _onlyShowOutdated = onlyShowOutdated;
     }
 
     public void AddIncludedLocation(string location)
@@ -49,7 +57,7 @@ public class Job
     {
         PopulateSolutions();
 
-        foreach (Solution solution in Solutions)
+        foreach (Solution solution in SolutionsToDisplay)
         {
             Results.Add($"SOLUTION: {solution.Name}");
 
@@ -89,12 +97,12 @@ public class Job
 
     private void PopulateSolutionsFromDisk(string location)
     {
-        Solutions =
+        _solutions.AddRange(
             DiskService.GetSolutions(location, _latestDotNetVersions)
                 .Where(s =>
                     _excludedLocations.None(e =>
                         s.Name.StartsWith(e, StringComparison.InvariantCultureIgnoreCase)))
-                .ToList();
+                .ToList());
     }
 
     private void PopulateSolutionsFromGitHub(string location)

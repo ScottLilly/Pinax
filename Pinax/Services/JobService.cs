@@ -14,6 +14,7 @@ public static class JobService
         List<string> includedLocations = new List<string>();
         List<string> excludedLocations = new List<string>();
         Enums.WarningLevel warningLevel = Enums.WarningLevel.Minor;
+        bool showOutdatedSolutionsOnly = false;
 
         foreach (var cmd in commands)
         {
@@ -23,14 +24,18 @@ public static class JobService
             if (cmd.Contains(":"))
             {
                 key = cmd[..cmd.IndexOf(":")];
-                val = cmd[(cmd.IndexOf(":")+1)..];
+                val = cmd[(cmd.IndexOf(":") + 1)..];
+            }
+            else
+            {
+                key = cmd;
             }
 
-            if (string.IsNullOrWhiteSpace(key) ||
-                string.IsNullOrWhiteSpace(val))
-            {
-                continue;
-            }
+            //if (string.IsNullOrWhiteSpace(key) ||
+            //    string.IsNullOrWhiteSpace(val))
+            //{
+            //    continue;
+            //}
 
             // Handle key/value parameters
             if (key.Matches("source"))
@@ -49,11 +54,16 @@ public static class JobService
             {
                 warningLevel = Enum.Parse<Enums.WarningLevel>(val, true);
             }
+            else if (key.Matches("outdated"))
+            {
+                showOutdatedSolutionsOnly = true;
+            }
         }
 
         // TODO: Handle bad parameters
 
-        var job = new Job(source, dotNetVersions, warningLevel);
+        var job =
+            new Job(source, dotNetVersions, warningLevel, showOutdatedSolutionsOnly);
 
         foreach (string location in includedLocations)
         {
