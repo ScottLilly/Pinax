@@ -40,7 +40,6 @@ public static class GitHubService
             {
                 projects.Add(Path.Combine(repository.FullName, resultsItem.Path));
             }
-
         }
 
         return projects;

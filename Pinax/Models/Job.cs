@@ -65,13 +65,15 @@ public class Job
             {
                 bool isOutdated = project.IsOutdated(_warningLevel);
 
-                string outdatedFlag = isOutdated ? "*" : "";
+                string outdatedProjectFlag = isOutdated ? "*" : "";
 
-                Results.Add($"{outdatedFlag}\tPROJECT: {project.ShortName} [{string.Join(';', project.ProjectTypes)}]");
+                Results.Add($"{outdatedProjectFlag}\tPROJECT: {project.ShortName} [{string.Join(';', project.ProjectTypes)}]");
 
                 foreach (Package package in project.Packages)
                 {
-                    Results.Add($"\t\tPACKAGE: {package.Name} {package.Version}");
+                    string outdatedPackageFlag = package.IsOutdated(_warningLevel) ? "*" : "";
+
+                    Results.Add($"{outdatedPackageFlag}\t\tPACKAGE: {package.Name} {package.Version} [{package.LatestNuGetVersion}]");
                 }
             }
         }
