@@ -19,10 +19,8 @@ public class Job
             ? _solutions.Where(s => s.HasOutdatedSolutions(_warningLevel))
             : _solutions;
 
-    public List<string> Results { get; } =
-        new List<string>();
-    public List<string> ValidationErrors { get; } =
-        new List<string>();
+    public List<string> Results { get; } = new();
+    public List<string> ValidationErrors { get; } = new();
 
     public bool IsValid => ValidationErrors.None();
 
@@ -73,7 +71,7 @@ public class Job
                 {
                     string outdatedPackageFlag = package.IsOutdated(_warningLevel) ? "*" : "";
 
-                    Results.Add($"{outdatedPackageFlag}\t\tPACKAGE: {package.Name} {package.Version} [{package.LatestNuGetVersion}]");
+                    Results.Add($"{outdatedPackageFlag}\t\tPACKAGE: {package}");
                 }
             }
         }

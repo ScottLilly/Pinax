@@ -65,5 +65,5 @@ public class Package
     }
 
     public override string ToString() =>
-        $"{Name} {Version}";
+        $"{Name} [In project: {Version}] [Latest: {LatestNuGetVersion}]";
 }

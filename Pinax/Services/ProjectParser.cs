@@ -1,5 +1,4 @@
 ﻿using System.Xml.Linq;
-using Newtonsoft.Json;
 using Pinax.Common;
 using Pinax.Models;
 using Pinax.Models.PackageManagers;
@@ -10,8 +9,8 @@ namespace Pinax.Services;
 
 public static class ProjectParser
 {
-    private static object s_syncLock = new();
-    private static Dictionary<string, Version> s_nuGetPackageVersions = new();
+    private static readonly object s_syncLock = new();
+    private static readonly Dictionary<string, Version> s_nuGetPackageVersions = new();
 
     public static DotNetProject GetProject(string filename,
         IEnumerable<string> lines, DotNetVersions latestVersions)
@@ -40,31 +39,8 @@ public static class ProjectParser
 
                     if (nuGetPackageDetails != null)
                     {
-                        Version latestVersion = new Version(0,0,0,0);
-
-                        foreach (NuGetPackageDetails.Item item in nuGetPackageDetails.items)
-                        {
-                            // TODO: Find better solution here
-                            if (item?.items == null)
-                            {
-                                continue;
-                            }
-
-                            foreach (NuGetPackageDetails.Item1 versionDetails in item.items)
-                            {
-                                string digits =
-                                    new(versionDetails.catalogEntry.version
-                                        .TakeWhile(c => char.IsDigit(c) || c == '.').ToArray());
-
-                                Version thisVersion =
-                                    Version.Parse(digits);
-
-                                if (thisVersion.CompareTo(latestVersion) > 0)
-                                {
-                                    latestVersion = thisVersion;
-                                }
-                            }
-                        }
+                        Version latestVersion =
+                            GetLatestVersionFromPackageDetails(nuGetPackageDetails);
 
                         s_nuGetPackageVersions
                             .TryAdd(package.Name.ToLowerInvariant(),
@@ -80,6 +56,37 @@ public static class ProjectParser
         }
 
         return project;
+    }
+
+    private static Version GetLatestVersionFromPackageDetails(NuGetPackageDetails nuGetPackageDetails)
+    {
+        Version latestVersion = new(0, 0, 0, 0);
+
+        foreach (NuGetPackageDetails.Item item in nuGetPackageDetails.items)
+        {
+            // TODO: Find better solution here
+            if (item?.items == null)
+            {
+                continue;
+            }
+
+            foreach (NuGetPackageDetails.Item1 versionDetails in item.items)
+            {
+                string digits =
+                    new(versionDetails.catalogEntry.version
+                        .TakeWhile(c => char.IsDigit(c) || c == '.').ToArray());
+
+                Version thisVersion =
+                    Version.Parse(digits);
+
+                if (thisVersion.CompareTo(latestVersion) > 0)
+                {
+                    latestVersion = thisVersion;
+                }
+            }
+        }
+
+        return latestVersion;
     }
 
     #region Private methods
@@ -135,21 +142,6 @@ public static class ProjectParser
         return Enums.DotNetType.Unknown;
     }
 
-    private static Version GetVersionFromString(string versionString)
-    {
-        string cleanedVersion =
-            versionString.Where(c => char.IsDigit(c) || c == '.')
-                .Aggregate("", (current, c) => current + c);
-
-        Version version = Version.Parse(cleanedVersion);
-
-        return new Version(
-            version.Major == -1 ? 0 : version.Major, 
-            version.Minor == -1 ? 0 : version.Minor,
-            version.Build == -1 ? 0 : version.Build,
-            version.Revision == -1 ? 0 : version.Revision);
-    }
-
     private static List<DotNetProjectType> GetProjectTypes(XElement? target)
     {
         List<DotNetProjectType> projectTypes =
@@ -162,8 +154,7 @@ public static class ProjectParser
             {
                 projectTypes.Add(
                     new DotNetProjectType(
-                        GetDotNetType(version),
-                        GetVersionFromString(version)));
+                        GetDotNetType(version), PinaxFunctions.GetVersionFromString(version)));
             }
         }
 

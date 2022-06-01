@@ -9,6 +9,5 @@ public class Solution
     public bool HasOutdatedSolutions(Enums.WarningLevel warningLevel) =>
         Projects.Any(p => p.IsOutdated(warningLevel));
 
-    public List<DotNetProject> Projects { get; } =
-        new List<DotNetProject>();
+    public List<DotNetProject> Projects { get; } = new();
 }
