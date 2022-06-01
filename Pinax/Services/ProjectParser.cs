@@ -1,6 +1,8 @@
 ﻿using System.Xml.Linq;
+using Newtonsoft.Json;
 using Pinax.Common;
 using Pinax.Models;
+using Pinax.Models.PackageManagers;
 using Pinax.Models.Projects;
 using Pinax.Models.ProjectTypes;
 
@@ -8,6 +10,9 @@ namespace Pinax.Services;
 
 public static class ProjectParser
 {
+    private static object s_syncLock = new();
+    private static Dictionary<string, Version> s_nuGetPackageVersions = new();
+
     public static DotNetProject GetProject(string filename,
         IEnumerable<string> lines, DotNetVersions latestVersions)
     {
@@ -19,6 +24,60 @@ public static class ProjectParser
 
         project.ProjectTypes.AddRange(projectTypes);
         project.Packages.AddRange(GetPackages(filename, projectFileText));
+
+        foreach (Package package in project.Packages)
+        {
+            lock (s_syncLock)
+            {
+                // TODO: Pass version from NuGetPackageDetails to package,
+                // so it can determine if the package is out of date.
+                // Use s_nuGetPackageVersions as a cache,
+                // to prevent multiple calls to the NuGet API for the same package.
+                if (!s_nuGetPackageVersions.ContainsKey(package.Name))
+                {
+                    NuGetPackageDetails? nuGetPackageDetails =
+                        PackageManagerService.GetNuGetPackageDetailsAsync(package.Name);
+
+                    if (nuGetPackageDetails != null)
+                    {
+                        Version latestVersion = new Version(0,0,0,0);
+
+                        foreach (NuGetPackageDetails.Item item in nuGetPackageDetails.items)
+                        {
+                            // TODO: Find better solution here
+                            if (item?.items == null)
+                            {
+                                continue;
+                            }
+
+                            foreach (NuGetPackageDetails.Item1 versionDetails in item.items)
+                            {
+                                string digits =
+                                    new(versionDetails.catalogEntry.version
+                                        .TakeWhile(c => char.IsDigit(c) || c == '.').ToArray());
+
+                                Version thisVersion =
+                                    Version.Parse(digits);
+
+                                if (thisVersion.CompareTo(latestVersion) > 0)
+                                {
+                                    latestVersion = thisVersion;
+                                }
+                            }
+                        }
+
+                        s_nuGetPackageVersions
+                            .TryAdd(package.Name.ToLowerInvariant(),
+                                latestVersion);
+                        //File.WriteAllText($"{package.Name}.json",
+                        //    JsonConvert.SerializeObject(nuGetPackageDetails, Formatting.Indented));
+                    }
+                }
+
+                package.LatestNuGetVersion =
+                    s_nuGetPackageVersions[package.Name.ToLowerInvariant()];
+            }
+        }
 
         return project;
     }
