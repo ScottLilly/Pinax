@@ -6,7 +6,7 @@ public static class GitHubService
 {
     private static string s_token = "";
     private static readonly GitHubClient s_githubClient =
-        new GitHubClient(new ProductHeaderValue("Pinax"));
+        new(new ProductHeaderValue("Pinax"));
 
     public static void SetToken(string token)
     {
