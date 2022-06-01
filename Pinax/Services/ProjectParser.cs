@@ -69,8 +69,8 @@ public static class ProjectParser
                         s_nuGetPackageVersions
                             .TryAdd(package.Name.ToLowerInvariant(),
                                 latestVersion);
-                        File.WriteAllText($"{package.Name}.json",
-                            JsonConvert.SerializeObject(nuGetPackageDetails, Formatting.Indented));
+                        //File.WriteAllText($"{package.Name}.json",
+                        //    JsonConvert.SerializeObject(nuGetPackageDetails, Formatting.Indented));
                     }
                 }
 
