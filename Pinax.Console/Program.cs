@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Diagnostics;
+using Microsoft.Extensions.Configuration;
 using Pinax.Models;
 using Pinax.Services;
 
