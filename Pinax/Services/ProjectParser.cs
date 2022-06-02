@@ -34,20 +34,36 @@ public static class ProjectParser
                 // to prevent multiple calls to the NuGet API for the same package.
                 if (!s_nuGetPackageVersions.ContainsKey(package.Name))
                 {
-                    NuGetPackageDetails? nuGetPackageDetails =
-                        PackageManagerService.GetNuGetPackageDetailsAsync(package.Name);
+                    NuGetPackageVersions? nuGetPackageVersions =
+                        PackageManagerService.GetNuGetPackageVersions(package.Name);
 
-                    if (nuGetPackageDetails != null)
+                    if (nuGetPackageVersions != null)
                     {
-                        Version latestVersion =
-                            GetLatestVersionFromPackageDetails(nuGetPackageDetails);
+                        var nonBetaVersion =
+                            nuGetPackageVersions.Versions
+                                .Where(v => v.ToCharArray().All(c => char.IsDigit(c) || c == '.'));
+
+                        var lastVersion = new Version(nonBetaVersion.Last());
 
                         s_nuGetPackageVersions
                             .TryAdd(package.Name.ToLowerInvariant(),
-                                latestVersion);
-                        //File.WriteAllText($"{package.Name}.json",
-                        //    JsonConvert.SerializeObject(nuGetPackageDetails, Formatting.Indented));
+                                lastVersion);
                     }
+
+                    //NuGetPackageDetails? nuGetPackageDetails =
+                    //    PackageManagerService.GetNuGetPackageDetails(package.Name);
+
+                    //if (nuGetPackageDetails != null)
+                    //{
+                    //    Version latestVersion =
+                    //        GetLatestVersionFromPackageDetails(nuGetPackageDetails);
+
+                    //    s_nuGetPackageVersions
+                    //        .TryAdd(package.Name.ToLowerInvariant(),
+                    //            latestVersion);
+                    //    //File.WriteAllText($"{package.Name}.json",
+                    //    //    JsonConvert.SerializeObject(nuGetPackageDetails, Formatting.Indented));
+                    //}
                 }
 
                 package.LatestNuGetVersion =

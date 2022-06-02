@@ -15,7 +15,7 @@ public static class PackageManagerService
         s_nuGetServices = GetNuGetServices();
     }
 
-    public static NuGetPackageDetails? GetNuGetPackageDetailsAsync(string packageName)
+    public static NuGetPackageDetails? GetNuGetPackageDetails(string packageName)
     {
         var serviceUri =
             s_nuGetServices?.Resources.First(r => r.Type.Equals("RegistrationsBaseUrl")).Id;
@@ -24,6 +24,17 @@ public static class PackageManagerService
             $"{serviceUri}{packageName.ToLowerInvariant()}/index.json";
 
         return GetDeserializedWebResponse<NuGetPackageDetails>(fullUriString);
+    }
+
+    public static NuGetPackageVersions? GetNuGetPackageVersions(string packageName)
+    {
+        var serviceUri =
+            s_nuGetServices?.Resources.First(r => r.Type.StartsWith("PackageBaseAddress")).Id;
+
+        string fullUriString =
+            $"{serviceUri}{packageName.ToLowerInvariant()}/index.json";
+
+        return GetDeserializedWebResponse<NuGetPackageVersions>(fullUriString);
     }
 
     private static NuGetServices? GetNuGetServices()
