@@ -31,12 +31,6 @@ public static class JobService
                 key = cmd;
             }
 
-            //if (string.IsNullOrWhiteSpace(key) ||
-            //    string.IsNullOrWhiteSpace(val))
-            //{
-            //    continue;
-            //}
-
             // Handle key/value parameters
             if (key.Matches("source"))
             {
