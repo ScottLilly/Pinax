@@ -26,6 +26,9 @@ public static class DiskService
                 Name = solutionFile
             };
 
+            solution.ProjectsInSolution
+                .AddRange(GetProjectsInSolution(solutionFileInfo));
+
             var projectFiles =
                 Directory.GetFiles(solutionFileInfo.DirectoryName,
                     "*.csproj", SearchOption.AllDirectories);
@@ -43,5 +46,26 @@ public static class DiskService
         }
 
         return solutions;
+    }
+
+    private static List<string> GetProjectsInSolution(FileInfo solutionFileInfo)
+    {
+        List<string> projectsInSolution = new();
+
+        var lines = File.ReadAllLines(solutionFileInfo.FullName);
+
+        foreach (string line in lines.Where(l => l.StartsWith("Project")))
+        {
+            var projectFileName =
+                line.Split(',')[1]
+                    .Replace("\"", "").Split('\\').Last();
+
+            if (!string.IsNullOrWhiteSpace(projectFileName))
+            {
+                projectsInSolution.Add(projectFileName);
+            }
+        }
+
+        return projectsInSolution;
     }
 }

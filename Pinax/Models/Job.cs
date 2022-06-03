@@ -64,8 +64,10 @@ public class Job
                 bool isOutdated = project.IsOutdated(_warningLevel);
 
                 string outdatedProjectFlag = isOutdated ? "*" : "";
+                string notInSolution =
+                    solution.ProjectsInSolution.None(p => p == project.ProjectFileName) ? "?" : "";
 
-                Results.Add($"{outdatedProjectFlag}\tPROJECT: {project.ShortName} [{string.Join(';', project.ProjectTypes)}]");
+                Results.Add($"{notInSolution}{outdatedProjectFlag}\tPROJECT: {project.ShortName} [{string.Join(';', project.ProjectTypes)}]");
 
                 foreach (Package package in project.Packages)
                 {
