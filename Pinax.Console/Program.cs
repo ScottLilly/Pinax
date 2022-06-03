@@ -1,10 +1,8 @@
-﻿using System.Diagnostics;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Pinax.Models;
 using Pinax.Services;
 
-Console.WriteLine("Pinax - GitHub language and library version monitoring tool");
-Console.WriteLine("Type '!help' to see available commands");
+DisplayAppInfo();
 
 DotNetVersions latestDotNetVersions =
     PersistenceService.GetLatestDotNetVersions();
@@ -25,7 +23,22 @@ do
 
     if (command.Equals("--help"))
     {
-        Console.WriteLine("--exit    Stops running Pinax");
+        Console.WriteLine("REQUIRED PARAMETERS");
+        Console.WriteLine("--source\tValid options: disk|github");
+        Console.WriteLine("--location\tGitHub URL or disk path (can be passed multiple times)");
+        Console.WriteLine("");
+        Console.WriteLine("OPTIONAL PARAMETERS");
+        Console.WriteLine("--exclude\tGitHub URL or disk path (can be passed multiple times)");
+        Console.WriteLine("--warning\tLevel to consider outdated. Valid options: major|minor|build|revision");
+        Console.WriteLine("--outdated\tIf passed, only show solutions with outdated projects or packages");
+        Console.WriteLine("");
+        Console.WriteLine("--cls\t\tClear screen");
+        Console.WriteLine("--exit\t\tStops running Pinax");
+    }
+    else if (command == "--cls")
+    {
+        Console.Clear();
+        DisplayAppInfo();
     }
     else
     {
@@ -43,7 +56,7 @@ do
         }
     }
 
-} while (!command?.Equals("!exit", StringComparison.InvariantCultureIgnoreCase) ?? true);
+} while (!command?.Equals("--exit", StringComparison.InvariantCultureIgnoreCase) ?? true);
 
 void SetupPinaxInstance()
 {
@@ -57,4 +70,10 @@ void SetupPinaxInstance()
         configuration.AsEnumerable().First(c => c.Key == "GitHubToken").Value;
 
     GitHubService.SetToken(userSecretsToken);
+}
+
+void DisplayAppInfo()
+{
+    Console.WriteLine("Pinax - GitHub language and library version monitoring tool");
+    Console.WriteLine("Type '--help' to see available commands");
 }
