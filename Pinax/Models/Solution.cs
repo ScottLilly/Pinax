@@ -4,6 +4,7 @@ namespace Pinax.Models;
 
 public class Solution
 {
+    public string Path { get; set; }
     public string Name { get; set; }
 
     public bool HasAnOutdatedProject(Enums.WarningLevel warningLevel) =>

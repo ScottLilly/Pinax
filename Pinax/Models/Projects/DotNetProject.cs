@@ -7,6 +7,7 @@ public class DotNetProject : IProject<DotNetProjectType>
     private readonly string _fileName;
     private readonly DotNetVersions _latestVersions;
 
+    public string Path { get; set; }
     public string ShortName =>
         string.Join('\\', _fileName.SplitPath().Skip(2));
     public string ProjectFileName =>
