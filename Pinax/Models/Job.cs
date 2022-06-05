@@ -9,6 +9,7 @@ public class Job
     private readonly DotNetVersions _latestDotNetVersions;
     private readonly Enums.WarningLevel _warningLevel;
     private readonly bool _onlyShowOutdated;
+    private readonly bool _ignoreUnusedProjects;
     private readonly List<string> _includedLocations = new();
     private readonly List<string> _excludedLocations = new();
 
@@ -16,7 +17,7 @@ public class Job
 
     private IEnumerable<Solution> SolutionsToDisplay =>
         _onlyShowOutdated
-            ? _solutions.Where(s => s.HasOutdatedSolutions(_warningLevel))
+            ? _solutions.Where(s => s.HasAnOutdatedProject(_warningLevel))
             : _solutions;
 
     public List<string> Results { get; } = new();
@@ -27,12 +28,14 @@ public class Job
     public Job(Enums.Source fileSource,
         DotNetVersions latestDotNetVersions,
         Enums.WarningLevel warningLevel,
-        bool onlyShowOutdated)
+        bool onlyShowOutdated,
+        bool ignoreUnusedProjects)
     {
         _fileSource = fileSource;
         _latestDotNetVersions = latestDotNetVersions;
         _warningLevel = warningLevel;
         _onlyShowOutdated = onlyShowOutdated;
+        _ignoreUnusedProjects = ignoreUnusedProjects;
     }
 
     public void AddIncludedLocation(string location)
@@ -57,17 +60,24 @@ public class Job
 
         foreach (Solution solution in SolutionsToDisplay)
         {
+            if (_onlyShowOutdated &&
+                !solution.HasAnOutdatedProject(_warningLevel))
+            {
+                continue;
+            }
+
             Results.Add($"SOLUTION: {solution.Name}");
 
             foreach (DotNetProject project in solution.Projects)
             {
                 bool isOutdated = project.IsOutdated(_warningLevel);
 
-                string outdatedProjectFlag = isOutdated ? "*" : "";
-                string notInSolution =
-                    solution.ProjectsInSolution.None(p => p == project.ProjectFileName) ? "?" : "";
+                string outdatedProjectIndicator = isOutdated ? "*" : "";
+                bool notInSolution =
+                    solution.ProjectsInSolution.None(p => p == project.ProjectFileName);
+                string notInSolutionIndicator = notInSolution ? "?" : "";
 
-                Results.Add($"{notInSolution}{outdatedProjectFlag}\tPROJECT: {project.ShortName} [{string.Join(';', project.ProjectTypes)}]");
+                Results.Add($"{notInSolutionIndicator}{outdatedProjectIndicator}\tPROJECT: {project.ShortName} [{string.Join(';', project.ProjectTypes)}]");
 
                 foreach (Package package in project.Packages)
                 {
@@ -88,7 +98,7 @@ public class Job
             switch (_fileSource)
             {
                 case Enums.Source.Disk:
-                    PopulateSolutionsFromDisk(location);
+                    PopulateSolutionsFromDisk(location, _ignoreUnusedProjects);
                     break;
                 case Enums.Source.GitHub:
                     PopulateSolutionsFromGitHub(location);
@@ -97,10 +107,10 @@ public class Job
         }
     }
 
-    private void PopulateSolutionsFromDisk(string location)
+    private void PopulateSolutionsFromDisk(string location, bool ignoreUnusedProjects)
     {
         _solutions.AddRange(
-            DiskService.GetSolutions(location, _latestDotNetVersions)
+            DiskService.GetSolutions(location, _latestDotNetVersions, ignoreUnusedProjects)
                 .Where(s =>
                     _excludedLocations.None(e =>
                         s.Name.StartsWith(e, StringComparison.InvariantCultureIgnoreCase)))
@@ -110,7 +120,8 @@ public class Job
     private void PopulateSolutionsFromGitHub(string location)
     {
         // TODO: Read solutions from GitHub
-        // GitHub searching
+        var solutions = GitHubService.GetSolutionFiles(location, "C#");
+
         var projects = GitHubService.GetProjectFiles(location, "C#");
 
         foreach (string project in projects)

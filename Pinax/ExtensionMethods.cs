@@ -34,4 +34,9 @@ public static class ExtensionMethods
             .GetCustomAttribute<DisplayAttribute>()
             ?.Name ?? enumType.ToString();
     }
+
+    public static IEnumerable<string> SplitPath(this string path)
+    {
+        return path.Split('/', '\\');
+    }
 }

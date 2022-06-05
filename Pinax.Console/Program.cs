@@ -31,6 +31,7 @@ do
         Console.WriteLine("--exclude\tGitHub URL or disk path (can be passed multiple times)");
         Console.WriteLine("--warning\tLevel to consider outdated. Valid options: major|minor|build|revision");
         Console.WriteLine("--outdated\tIf passed, only show solutions with outdated projects or packages");
+        Console.WriteLine("--ignoreunused\tIf passed, does not check projects that are not in the solution file");
         Console.WriteLine("");
         Console.WriteLine("--cls\t\tClear screen");
         Console.WriteLine("--exit\t\tStops running Pinax");
