@@ -60,7 +60,7 @@ public class Job
 
         foreach (Solution solution in SolutionsToDisplay)
         {
-            Results.Add($"SOLUTION: {solution.Name}");
+            Results.Add($"SOLUTION: {Path.Combine(solution.Path, solution.Name)}");
 
             foreach (DotNetProject project in solution.Projects)
             {
@@ -68,10 +68,10 @@ public class Job
 
                 string outdatedProjectIndicator = isOutdated ? "*" : "";
                 bool notInSolution =
-                    solution.ProjectsInSolution.None(p => p == project.ProjectFileName);
+                    solution.ProjectsInSolution.None(p => p == project.Name);
                 string notInSolutionIndicator = notInSolution ? "?" : "";
 
-                Results.Add($"{notInSolutionIndicator}{outdatedProjectIndicator}\tPROJECT: {project.ShortName} [{string.Join(';', project.ProjectTypes)}]");
+                Results.Add($"{notInSolutionIndicator}{outdatedProjectIndicator}\tPROJECT: {project.Name} [{string.Join(';', project.ProjectTypes)}]");
 
                 foreach (Package package in project.Packages)
                 {

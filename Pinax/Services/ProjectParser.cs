@@ -19,7 +19,8 @@ public static class ProjectParser
 
         var projectTypes = GetProjectTypes(projectFileText);
 
-        var project = new DotNetProject(filename, latestVersions);
+        var fileInfo = new FileInfo(filename);
+        var project = new DotNetProject(fileInfo.DirectoryName, fileInfo.Name, latestVersions);
 
         project.ProjectTypes.AddRange(projectTypes);
         project.Packages.AddRange(GetPackages(filename, projectFileText));

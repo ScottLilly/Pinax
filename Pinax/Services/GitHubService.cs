@@ -29,11 +29,7 @@ public static class GitHubService
 
         foreach (SearchCode solutionFile in solutionFiles.Items)
         {
-            solutions.Add(new Solution
-            {
-                Path = solutionFile.Repository.HtmlUrl,
-                Name = Path.Combine(solutionFile.Name)
-            });
+            solutions.Add(new Solution(solutionFile.Repository.HtmlUrl, solutionFile.Name));
         }
 
         // Get project files and populate in correct solution
@@ -42,8 +38,9 @@ public static class GitHubService
 
         foreach (SearchCode projectFile in projectFiles.Items)
         {
-            var project = new DotNetProject(projectFile.Name, latestVersions);
-            project.Path = projectFile.Repository.HtmlUrl;
+            var project =
+                new DotNetProject(projectFile.Repository.HtmlUrl, 
+                    projectFile.Name, latestVersions);
 
             Solution? parentSolution =
                 solutions.FirstOrDefault(s => s.Path == project.Path);
