@@ -8,9 +8,9 @@ public class DotNetProject : IProject<DotNetProjectType>
     private readonly DotNetVersions _latestVersions;
 
     public string ShortName =>
-        string.Join('\\', _fileName.Split('\\').Skip(2));
+        string.Join('\\', _fileName.SplitPath().Skip(2));
     public string ProjectFileName =>
-        _fileName.Split('\\').Last();
+        _fileName.SplitPath().Last();
 
     public List<DotNetProjectType> ProjectTypes { get; } = new();
     public List<Package> Packages { get; } = new();

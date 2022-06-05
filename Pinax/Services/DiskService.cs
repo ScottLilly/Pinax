@@ -5,7 +5,8 @@ namespace Pinax.Services;
 
 public static class DiskService
 {
-    public static List<Solution> GetSolutions(string rootDirectory, DotNetVersions latestVersions)
+    public static List<Solution> GetSolutions(string rootDirectory,
+        DotNetVersions latestVersions, bool ignoreUnusedProjects)
     {
         if (!Directory.Exists(rootDirectory))
         {
@@ -33,6 +34,13 @@ public static class DiskService
                 Directory.GetFiles(solutionFileInfo.DirectoryName,
                     "*.csproj", SearchOption.AllDirectories);
 
+            if (ignoreUnusedProjects)
+            {
+                projectFiles =
+                    projectFiles.Where(p =>
+                        solution.ProjectsInSolution.Contains(p.SplitPath().Last())).ToArray();
+            }
+
             foreach (var projectFile in projectFiles)
             {
                 DotNetProject project = 
@@ -58,7 +66,7 @@ public static class DiskService
         {
             var projectFileName =
                 line.Split(',')[1]
-                    .Replace("\"", "").Split('\\').Last();
+                    .Replace("\"", "").SplitPath().Last();
 
             if (!string.IsNullOrWhiteSpace(projectFileName))
             {

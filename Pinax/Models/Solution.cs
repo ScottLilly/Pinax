@@ -6,7 +6,7 @@ public class Solution
 {
     public string Name { get; set; }
 
-    public bool HasOutdatedSolutions(Enums.WarningLevel warningLevel) =>
+    public bool HasAnOutdatedProject(Enums.WarningLevel warningLevel) =>
         Projects.Any(p => p.IsOutdated(warningLevel));
 
     public List<string> ProjectsInSolution { get; } = new();
