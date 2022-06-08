@@ -60,13 +60,7 @@ public class Job
 
         foreach (Solution solution in SolutionsToDisplay)
         {
-            if (_onlyShowOutdated &&
-                !solution.HasAnOutdatedProject(_warningLevel))
-            {
-                continue;
-            }
-
-            Results.Add($"SOLUTION: {solution.Name}");
+            Results.Add($"SOLUTION: {Path.Combine(solution.Path, solution.Name)}");
 
             foreach (DotNetProject project in solution.Projects)
             {
@@ -74,10 +68,10 @@ public class Job
 
                 string outdatedProjectIndicator = isOutdated ? "*" : "";
                 bool notInSolution =
-                    solution.ProjectsInSolution.None(p => p == project.ProjectFileName);
+                    solution.ProjectsInSolution.None(p => p == project.Name);
                 string notInSolutionIndicator = notInSolution ? "?" : "";
 
-                Results.Add($"{notInSolutionIndicator}{outdatedProjectIndicator}\tPROJECT: {project.ShortName} [{string.Join(';', project.ProjectTypes)}]");
+                Results.Add($"{notInSolutionIndicator}{outdatedProjectIndicator}\tPROJECT: {project.Name} [{string.Join(';', project.ProjectTypes)}]");
 
                 foreach (Package package in project.Packages)
                 {
@@ -98,7 +92,7 @@ public class Job
             switch (_fileSource)
             {
                 case Enums.Source.Disk:
-                    PopulateSolutionsFromDisk(location, _ignoreUnusedProjects);
+                    PopulateSolutionsFromDisk(location);
                     break;
                 case Enums.Source.GitHub:
                     PopulateSolutionsFromGitHub(location);
@@ -107,10 +101,11 @@ public class Job
         }
     }
 
-    private void PopulateSolutionsFromDisk(string location, bool ignoreUnusedProjects)
+    private void PopulateSolutionsFromDisk(string location)
     {
         _solutions.AddRange(
-            DiskService.GetSolutions(location, _latestDotNetVersions, ignoreUnusedProjects)
+            DiskService.GetSolutions(location, 
+                    _latestDotNetVersions, _ignoreUnusedProjects)
                 .Where(s =>
                     _excludedLocations.None(e =>
                         s.Name.StartsWith(e, StringComparison.InvariantCultureIgnoreCase)))
@@ -119,15 +114,11 @@ public class Job
 
     private void PopulateSolutionsFromGitHub(string location)
     {
-        // TODO: Read solutions from GitHub
-        var solutions = GitHubService.GetSolutionFiles(location, "C#");
+        var solutions =
+            GitHubService.GetSolutions(location, 
+                _latestDotNetVersions, _ignoreUnusedProjects);
 
-        var projects = GitHubService.GetProjectFiles(location, "C#");
-
-        foreach (string project in projects)
-        {
-            Results.Add($"PROJECT: {project}");
-        }
+        _solutions.AddRange(solutions);
     }
 
     #endregion

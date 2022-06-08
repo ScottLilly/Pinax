@@ -7,17 +7,20 @@ public class DotNetProject : IProject<DotNetProjectType>
     private readonly string _fileName;
     private readonly DotNetVersions _latestVersions;
 
-    public string ShortName =>
-        string.Join('\\', _fileName.SplitPath().Skip(2));
-    public string ProjectFileName =>
-        _fileName.SplitPath().Last();
+    public string Path { get; }
+    public string Name { get; }
+    //public string ShortName =>
+    //    string.Join('\\', _fileName.SplitPath().Skip(2));
+    //public string ProjectFileName =>
+    //    _fileName.SplitPath().Last();
 
     public List<DotNetProjectType> ProjectTypes { get; } = new();
     public List<Package> Packages { get; } = new();
 
-    public DotNetProject(string fileName, DotNetVersions latestVersions)
+    public DotNetProject(string path, string fileName, DotNetVersions latestVersions)
     {
-        _fileName = fileName;
+        Path = path;
+        Name = fileName;
         _latestVersions = latestVersions;
     }
 

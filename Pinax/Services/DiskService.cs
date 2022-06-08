@@ -22,10 +22,8 @@ public static class DiskService
         {
             var solutionFileInfo = new FileInfo(solutionFile);
 
-            var solution = new Solution
-            {
-                Name = solutionFile
-            };
+            var solution =
+                new Solution(solutionFileInfo.DirectoryName, solutionFile);
 
             solution.ProjectsInSolution
                 .AddRange(GetProjectsInSolution(solutionFileInfo));
