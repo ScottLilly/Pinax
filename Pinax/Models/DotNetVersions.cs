@@ -1,4 +1,6 @@
-﻿namespace Pinax.Models;
+﻿using Newtonsoft.Json;
+
+namespace Pinax.Models;
 
 public class DotNetVersions
 {
