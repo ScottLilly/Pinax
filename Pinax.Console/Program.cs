@@ -14,47 +14,46 @@ string? command = "";
 
 do
 {
-    command = Console.ReadLine();
+    try
+    {
+        command = Console.ReadLine();
 
-    if (command == null)
-    {
-        continue;
-    }
-
-    if (command.Equals("--help"))
-    {
-        Console.WriteLine("REQUIRED PARAMETERS");
-        Console.WriteLine("--source\tValid options: disk|github");
-        Console.WriteLine("--location\tGitHub URL or disk path (can be passed multiple times)");
-        Console.WriteLine("");
-        Console.WriteLine("OPTIONAL PARAMETERS");
-        Console.WriteLine("--exclude\tGitHub URL or disk path (can be passed multiple times)");
-        Console.WriteLine("--warning\tLevel to consider outdated. Valid options: major|minor|build|revision");
-        Console.WriteLine("--outdated\tIf passed, only show solutions with outdated projects or packages");
-        Console.WriteLine("--ignoreunused\tIf passed, does not check projects that are not in the solution file");
-        Console.WriteLine("");
-        Console.WriteLine("--cls\t\tClear screen");
-        Console.WriteLine("--exit\t\tStops running Pinax");
-    }
-    else if (command == "--cls")
-    {
-        Console.Clear();
-        DisplayAppInfo();
-    }
-    else
-    {
-        var job =
-            JobService.BuildJobFromCommand(command, latestDotNetVersions);
-
-        if (job.IsValid)
+        if (command == null)
         {
-            job.Execute();
+            continue;
+        }
 
-            foreach (var result in job.Results)
+        if (command.Equals("--help"))
+        {
+            DisplayHelpText();
+        }
+        else if (command == "--cls")
+        {
+            Console.Clear();
+            DisplayAppInfo();
+        }
+        else
+        {
+            var job =
+                JobService.BuildJobFromCommand(command, latestDotNetVersions);
+
+            if (job.IsValid)
             {
-                Console.WriteLine(result);
+                job.Execute();
+
+                foreach (var result in job.Results)
+                {
+                    Console.WriteLine(result);
+                }
             }
         }
+    }
+    catch (Exception e)
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.Error.WriteLine(e);
+        Console.ForegroundColor = ConsoleColor.White;
+        command = "--exit";
     }
 
 } while (!command?.Equals("--exit", StringComparison.InvariantCultureIgnoreCase) ?? true);
@@ -77,4 +76,20 @@ void DisplayAppInfo()
 {
     Console.WriteLine("Pinax - GitHub language and library version monitoring tool");
     Console.WriteLine("Type '--help' to see available commands");
+}
+
+void DisplayHelpText()
+{
+    Console.WriteLine("REQUIRED PARAMETERS");
+    Console.WriteLine("--source\tValid options: disk|github");
+    Console.WriteLine("--location\tGitHub URL or disk path (can be passed multiple times)");
+    Console.WriteLine("");
+    Console.WriteLine("OPTIONAL PARAMETERS");
+    Console.WriteLine("--exclude\tGitHub URL or disk path (can be passed multiple times)");
+    Console.WriteLine("--warning\tLevel to consider outdated. Valid options: major|minor|build|revision");
+    Console.WriteLine("--outdated\tIf passed, only show solutions with outdated projects or packages");
+    Console.WriteLine("--ignoreunused\tIf passed, does not check projects that are not in the solution file");
+    Console.WriteLine("");
+    Console.WriteLine("--cls\t\tClear screen");
+    Console.WriteLine("--exit\t\tStops running Pinax");
 }
