@@ -1,55 +1,29 @@
-﻿using Newtonsoft.Json;
-using Pinax.Models.PackageManagers;
+﻿using NuGet.Common;
+using NuGet.Protocol;
+using NuGet.Protocol.Core.Types;
+using NuGet.Versioning;
 
 namespace Pinax.Services;
 
 public static class PackageManagerService
 {
-    private const string NUGET_SERVICES_INDEX_URL =
-        "https://api.nuget.org/v3/index.json";
+    private static readonly SourceCacheContext s_cache = new();
+    private static readonly SourceRepository s_repository =
+        Repository.Factory.GetCoreV3("https://api.nuget.org/v3/index.json");
 
-    private static readonly NuGetServices? s_nuGetServices;
-
-    static PackageManagerService()
+    public static async Task<List<NuGetVersion>> GetPackageVersions(string packageName)
     {
-        s_nuGetServices = GetNuGetServices();
+        FindPackageByIdResource resource =
+            await s_repository.GetResourceAsync<FindPackageByIdResource>()
+                .ConfigureAwait(false);
+
+        IEnumerable<NuGetVersion> versions =
+            resource.GetAllVersionsAsync(
+            packageName,
+            s_cache,
+            NullLogger.Instance,
+            CancellationToken.None).Result;
+
+        return versions.Where(v => !v.IsPrerelease).ToList();
     }
-
-    public static NuGetPackageVersions? GetNuGetPackageVersions(string packageName)
-    {
-        var serviceUri =
-            s_nuGetServices?
-                .Resources
-                .First(r => r.Type.StartsWith("PackageBaseAddress"))
-                .Id;
-
-        string fullUriString =
-            $"{serviceUri}{packageName.ToLowerInvariant()}/index.json";
-
-        return GetDeserializedWebResponse<NuGetPackageVersions>(fullUriString);
-    }
-
-    private static NuGetServices? GetNuGetServices()
-    {
-        return GetDeserializedWebResponse<NuGetServices>(NUGET_SERVICES_INDEX_URL);
-    }
-
-    private static T? GetDeserializedWebResponse<T>(string uri)
-    {
-        using var httpClient = new HttpClient();
-        var request = new HttpRequestMessage(HttpMethod.Get, uri);
-
-        HttpResponseMessage response = httpClient.Send(request);
-
-        if (response.IsSuccessStatusCode)
-        {
-            using var reader = new StreamReader(response.Content.ReadAsStream());
-            var responseBody = reader.ReadToEnd();
-
-            return JsonConvert.DeserializeObject<T>(responseBody);
-        }
-
-        return default(T);
-    }
-
 }

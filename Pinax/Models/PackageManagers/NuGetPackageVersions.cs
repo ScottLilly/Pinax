@@ -1,9 +1,6 @@
-﻿using Newtonsoft.Json;
-
-namespace Pinax.Models.PackageManagers;
+﻿namespace Pinax.Models.PackageManagers;
 
 public class NuGetPackageVersions
 {
-    [JsonProperty("versions")]
-    public string[] Versions { get; set; }
+    public List<NuGetPackageVersions> Versions { get; } = new();
 }
