@@ -1,7 +1,6 @@
 ﻿using System.Xml.Linq;
 using Pinax.Common;
 using Pinax.Models;
-using Pinax.Models.PackageManagers;
 using Pinax.Models.Projects;
 using Pinax.Models.ProjectTypes;
 
@@ -9,9 +8,6 @@ namespace Pinax.Services;
 
 public static class ProjectParser
 {
-    private static readonly object s_syncLock = new();
-    private static readonly Dictionary<string, Version> s_nuGetPackageVersions = new();
-
     public static DotNetProject ParseProjectFileText(string filename,
         IEnumerable<string> lines)
     {
@@ -22,39 +18,19 @@ public static class ProjectParser
         var fileInfo = new FileInfo(filename);
         var project = new DotNetProject(fileInfo.ToFileDetails());
 
+        // Add versions of .NET for project
         project.ProjectTypes.AddRange(projectTypes);
-        project.Packages.AddRange(GetPackages(filename, projectFileText));
 
+        // Add packages used by project
+        var packagesInProject = GetPackagesFromProjectFile(filename, projectFileText);
+        project.Packages.AddRange(packagesInProject);
+
+        // Get latest version of each package from NuGet
         foreach (Package package in project.Packages)
         {
-            lock (s_syncLock)
-            {
-                // TODO: Pass latest version from NuGet API to package,
-                // so it can determine if the package is out of date.
-                // Use s_nuGetPackageVersions as a cache,
-                // to prevent multiple calls to the NuGet API for the same package.
-                if (!s_nuGetPackageVersions.ContainsKey(package.Name))
-                {
-                    NuGetPackageVersions? nuGetPackageVersions =
-                        PackageManagerService.GetNuGetPackageVersions(package.Name);
-
-                    if (nuGetPackageVersions != null)
-                    {
-                        var nonBetaVersion =
-                            nuGetPackageVersions.Versions
-                                .Where(v => v.ToCharArray().All(c => char.IsDigit(c) || c == '.'));
-
-                        var lastVersion = new Version(nonBetaVersion.Last());
-
-                        s_nuGetPackageVersions
-                            .TryAdd(package.Name.ToLowerInvariant(),
-                                lastVersion);
-                    }
-                }
-
-                package.LatestNuGetVersion =
-                    s_nuGetPackageVersions[package.Name.ToLowerInvariant()];
-            }
+            package.LatestNuGetVersion = 
+                PackageManagerService.GetPackageVersions(package.Name)
+                    .Result.Last().Version;
         }
 
         return project;
@@ -132,7 +108,8 @@ public static class ProjectParser
         return projectTypes;
     }
 
-    private static List<Package> GetPackages(string projectFileName, string projectFileText)
+    private static List<Package> GetPackagesFromProjectFile(string projectFileName,
+        string projectFileText)
     {
         XElement root = XElement.Parse(projectFileText);
         XmlFunctions.RemoveNamespacePrefix(root);
@@ -171,7 +148,7 @@ public static class ProjectParser
         var packages = new List<Package>();
         var projectFile = new FileInfo(projectFileName);
         string packageFileName =
-            Path.Combine(projectFile.DirectoryName, "packages.config");
+            Path.Combine(projectFile.DirectoryName ?? "", "packages.config");
 
         if (File.Exists(packageFileName))
         {
