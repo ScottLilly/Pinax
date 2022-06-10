@@ -1,5 +1,6 @@
 ﻿using Pinax.Models;
 using Pinax.Models.Projects;
+using Pinax.Services.FileReader;
 
 namespace Pinax.Services;
 
@@ -13,23 +14,19 @@ public static class DiskService
             Console.WriteLine($"Directory '{rootDirectory}' does not exist");
         }
 
-        var solutions = new List<Solution>();
+        var diskFileReader = FileReaderFactory.GetDiskFileReader(rootDirectory);
 
-        var solutionFiles =
-            Directory.GetFiles(rootDirectory, "*.sln", SearchOption.AllDirectories);
+        var solutionFiles = diskFileReader.GetSolutionFiles();
 
-        foreach (string solutionFile in solutionFiles)
+        var solutions =
+            solutionFiles.Select(s => new Solution(s)).ToList();
+
+        foreach (Solution solution in solutions)
         {
-            var solutionFileInfo = new FileInfo(solutionFile);
-
-            var solution =
-                new Solution(solutionFileInfo.DirectoryName, solutionFile);
-
-            solution.ProjectsInSolution
-                .AddRange(GetProjectsInSolution(solutionFileInfo));
+            PopulateProjectsInSolutionFile(solution);
 
             var projectFiles =
-                Directory.GetFiles(solutionFileInfo.DirectoryName,
+                Directory.GetFiles(solution.Path,
                     "*.csproj", SearchOption.AllDirectories);
 
             if (ignoreUnusedProjects)
@@ -47,18 +44,14 @@ public static class DiskService
 
                 solution.Projects.Add(project);
             }
-
-            solutions.Add(solution);
         }
 
-        return solutions;
+        return solutions.ToList();
     }
 
-    private static List<string> GetProjectsInSolution(FileInfo solutionFileInfo)
+    private static void PopulateProjectsInSolutionFile(Solution solution)
     {
-        List<string> projectsInSolution = new();
-
-        var lines = File.ReadAllLines(solutionFileInfo.FullName);
+        var lines = File.ReadAllLines(solution.FullName);
 
         foreach (string line in lines.Where(l => l.StartsWith("Project")))
         {
@@ -68,10 +61,8 @@ public static class DiskService
 
             if (!string.IsNullOrWhiteSpace(projectFileName))
             {
-                projectsInSolution.Add(projectFileName);
+                solution.ProjectsInSolution.Add(projectFileName);
             }
         }
-
-        return projectsInSolution;
     }
 }

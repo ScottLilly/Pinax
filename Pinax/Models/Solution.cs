@@ -4,18 +4,21 @@ namespace Pinax.Models;
 
 public class Solution
 {
-    public string Path { get; }
-    public string Name { get; }
+    private readonly FileDetails _fileDetails;
 
     public List<string> ProjectsInSolution { get; } = new();
     public List<DotNetProject> Projects { get; } = new();
 
+    public string Path => _fileDetails.Path;
+    public string Name => _fileDetails.Name;
+
+    public string FullName =>
+        System.IO.Path.Combine(Path, Name);
     public bool HasAnOutdatedProject(Enums.WarningLevel warningLevel) =>
         Projects.Any(p => p.IsOutdated(warningLevel));
 
-    public Solution(string path, string name)
+    public Solution(FileDetails fileDetails)
     {
-        Path = path;
-        Name = name;
+        _fileDetails = fileDetails;
     }
 }
