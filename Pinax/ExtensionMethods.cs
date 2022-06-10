@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using Octokit;
+using Pinax.Models;
 
 namespace Pinax;
 
@@ -38,5 +40,15 @@ public static class ExtensionMethods
     public static IEnumerable<string> SplitPath(this string path)
     {
         return path.Split('/', '\\');
+    }
+
+    public static FileDetails ToFileDetails(this SearchCode searchItem)
+    {
+        return new FileDetails(searchItem.Repository.HtmlUrl, searchItem.Name);
+    }
+
+    public static FileDetails ToFileDetails(this FileInfo fileInfo)
+    {
+        return new FileDetails(fileInfo.DirectoryName ?? "", fileInfo.Name);
     }
 }

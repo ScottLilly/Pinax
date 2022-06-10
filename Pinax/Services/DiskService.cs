@@ -14,12 +14,10 @@ public static class DiskService
             Console.WriteLine($"Directory '{rootDirectory}' does not exist");
         }
 
-        var diskFileReader = FileReaderFactory.GetDiskFileReader(rootDirectory);
+        IFileReader diskFileReader =
+            FileReaderFactory.GetDiskFileReader(rootDirectory);
 
-        var solutionFiles = diskFileReader.GetSolutionFiles();
-
-        var solutions =
-            solutionFiles.Select(s => new Solution(s)).ToList();
+        var solutions = diskFileReader.GetSolutions();
 
         foreach (Solution solution in solutions)
         {

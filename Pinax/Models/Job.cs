@@ -17,7 +17,7 @@ public class Job
 
     private IEnumerable<Solution> SolutionsToDisplay =>
         _onlyShowOutdated
-            ? _solutions.Where(s => s.HasAnOutdatedProject(_warningLevel))
+            ? _solutions.Where(s => s.HasAnOutdatedProject(_latestDotNetVersions, _warningLevel))
             : _solutions;
 
     public List<string> Results { get; } = new();
@@ -64,7 +64,7 @@ public class Job
 
             foreach (DotNetProject project in solution.Projects)
             {
-                bool isOutdated = project.IsOutdated(_warningLevel);
+                bool isOutdated = project.IsOutdated(_latestDotNetVersions, _warningLevel);
 
                 string outdatedProjectIndicator = isOutdated ? "*" : "";
                 bool notInSolution =

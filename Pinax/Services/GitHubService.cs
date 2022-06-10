@@ -23,12 +23,10 @@ public static class GitHubService
         var authToken = new Credentials(s_token);
         s_githubClient.Credentials = authToken;
 
-        var gitFileReader = FileReaderFactory.GetGitFileReader(s_token, username);
+        IFileReader gitFileReader =
+            FileReaderFactory.GetGitFileReader(s_token, username);
 
-        var solutionFiles = gitFileReader.GetSolutionFiles();
-
-        var solutions =
-            solutionFiles.Select(s => new Solution(s)).ToList();
+        var solutions = gitFileReader.GetSolutions();
 
         // Get project files and populate in correct solution
         var projectFiles =
@@ -37,8 +35,7 @@ public static class GitHubService
         foreach (SearchCode projectFile in projectFiles.Items)
         {
             var project =
-                new DotNetProject(projectFile.Repository.HtmlUrl, 
-                    projectFile.Name, latestVersions);
+                new DotNetProject(projectFile.ToFileDetails());
 
             Solution? parentSolution =
                 solutions.FirstOrDefault(s => s.Path == project.Path);

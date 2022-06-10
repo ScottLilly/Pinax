@@ -4,48 +4,41 @@ namespace Pinax.Models.Projects;
 
 public class DotNetProject : IProject<DotNetProjectType>
 {
-    private readonly string _fileName;
-    private readonly DotNetVersions _latestVersions;
-
-    public string Path { get; }
-    public string Name { get; }
-    //public string ShortName =>
-    //    string.Join('\\', _fileName.SplitPath().Skip(2));
-    //public string ProjectFileName =>
-    //    _fileName.SplitPath().Last();
+    private readonly FileDetails _fileDetails;
 
     public List<DotNetProjectType> ProjectTypes { get; } = new();
     public List<Package> Packages { get; } = new();
 
-    public DotNetProject(string path, string fileName, DotNetVersions latestVersions)
+    public string Path => _fileDetails.Path;
+    public string Name => _fileDetails.Name;
+
+    public DotNetProject(FileDetails fileDetails)
     {
-        Path = path;
-        Name = fileName;
-        _latestVersions = latestVersions;
+        _fileDetails = fileDetails;
     }
 
-    public bool IsOutdated(Enums.WarningLevel warningLevel)
+    public bool IsOutdated(DotNetVersions latestVersions, Enums.WarningLevel warningLevel)
     {
         if (HasOutdatedProjectForType(Enums.DotNetType.Standard,
-                warningLevel, _latestVersions.Standard))
+                warningLevel, latestVersions.Standard))
         {
             return true;
         }
 
         if (HasOutdatedProjectForType(Enums.DotNetType.Core,
-                warningLevel, _latestVersions.Core))
+                warningLevel, latestVersions.Core))
         {
             return true;
         }
 
         if (HasOutdatedProjectForType(Enums.DotNetType.Framework,
-                warningLevel, _latestVersions.Framework))
+                warningLevel, latestVersions.Framework))
         {
             return true;
         }
 
         if (HasOutdatedProjectForType(Enums.DotNetType.DotNet,
-                warningLevel, _latestVersions.DotNet))
+                warningLevel, latestVersions.DotNet))
         {
             return true;
         }
