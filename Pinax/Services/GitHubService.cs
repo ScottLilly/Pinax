@@ -1,6 +1,7 @@
 ﻿using Octokit;
 using Pinax.Models;
 using Pinax.Models.Projects;
+using Pinax.Services.FileReader;
 
 namespace Pinax.Services;
 
@@ -17,20 +18,17 @@ public static class GitHubService
     }
 
     public static List<Solution> GetSolutions(string username,
-        DotNetVersions latestVersions, bool ignoreUnusedProjects)
+        DotNetVersions latestVersions)
     {
         var authToken = new Credentials(s_token);
         s_githubClient.Credentials = authToken;
 
-        var solutionFiles =
-            s_githubClient.Search.SearchCode(new SearchCodeRequest($"user:{username} extension:sln")).Result;
+        var gitFileReader = FileReaderFactory.GetGitFileReader(s_token, username);
 
-        List<Solution> solutions = new List<Solution>();
+        var solutionFiles = gitFileReader.GetSolutionFiles();
 
-        foreach (SearchCode solutionFile in solutionFiles.Items)
-        {
-            solutions.Add(new Solution(solutionFile.Repository.HtmlUrl, solutionFile.Name));
-        }
+        var solutions =
+            solutionFiles.Select(s => new Solution(s)).ToList();
 
         // Get project files and populate in correct solution
         var projectFiles =
@@ -48,6 +46,6 @@ public static class GitHubService
             parentSolution?.Projects.Add(project);
         }
 
-        return solutions;
+        return solutions.ToList();
     }
 }

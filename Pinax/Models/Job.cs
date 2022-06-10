@@ -116,7 +116,7 @@ public class Job
     {
         var solutions =
             GitHubService.GetSolutions(location, 
-                _latestDotNetVersions, _ignoreUnusedProjects);
+                _latestDotNetVersions);
 
         _solutions.AddRange(solutions);
     }
