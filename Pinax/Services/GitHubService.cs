@@ -17,8 +17,7 @@ public static class GitHubService
         s_token = token;
     }
 
-    public static List<Solution> GetSolutions(string username,
-        DotNetVersions latestVersions)
+    public static List<Solution> GetSolutions(string username)
     {
         var authToken = new Credentials(s_token);
         s_githubClient.Credentials = authToken;
@@ -27,16 +26,17 @@ public static class GitHubService
             FileReaderFactory.GetGitFileReader(s_token, username);
 
         var solutions = gitFileReader.GetSolutions();
+        var projects = gitFileReader.GetDotNetProjects();
 
-        // Get project files and populate in correct solution
-        var projectFiles =
-            s_githubClient.Search.SearchCode(new SearchCodeRequest($"user:{username} extension:csproj")).Result;
+        // Get list of projects in the .sln file
+        solutions.ForEach(PopulateProjectsInSolutionFile);
 
-        foreach (SearchCode projectFile in projectFiles.Items)
+        // Add projects to their solutions
+        foreach (DotNetProject project in projects)
         {
-            var project =
-                new DotNetProject(projectFile.ToFileDetails());
-
+            // TODO: Populate Solution.ProjectsInSolution (from .sln file)
+            // and apply "--ignoreunused" parameter, is passed
+            // See existing implementation in DiskService.GetSolutions()
             Solution? parentSolution =
                 solutions.FirstOrDefault(s => s.Path == project.Path);
 
@@ -44,5 +44,25 @@ public static class GitHubService
         }
 
         return solutions.ToList();
+    }
+
+    private static void PopulateProjectsInSolutionFile(Solution solution)
+    {
+        // TODO: Convert to read .sln files from GitHub
+        // and file the project files in them
+
+        //var lines = File.ReadAllLines(solution.FullName);
+
+        //foreach (string line in lines.Where(l => l.StartsWith("Project")))
+        //{
+        //    var projectFileName =
+        //        line.Split(',')[1]
+        //            .Replace("\"", "").SplitPath().Last();
+
+        //    if (!string.IsNullOrWhiteSpace(projectFileName))
+        //    {
+        //        solution.ProjectsInSolution.Add(projectFileName);
+        //    }
+        //}
     }
 }

@@ -11,6 +11,8 @@ public class DotNetProject : IProject<DotNetProjectType>
 
     public string Path => _fileDetails.Path;
     public string Name => _fileDetails.Name;
+    public string FullName =>
+        System.IO.Path.Combine(Path, Name);
 
     public DotNetProject(FileDetails fileDetails)
     {

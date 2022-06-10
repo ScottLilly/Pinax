@@ -7,7 +7,7 @@ namespace Pinax.Services;
 public static class DiskService
 {
     public static List<Solution> GetSolutions(string rootDirectory,
-        DotNetVersions latestVersions, bool ignoreUnusedProjects)
+        bool ignoreUnusedProjects)
     {
         if (!Directory.Exists(rootDirectory))
         {
@@ -18,27 +18,32 @@ public static class DiskService
             FileReaderFactory.GetDiskFileReader(rootDirectory);
 
         var solutions = diskFileReader.GetSolutions();
+        var projects = diskFileReader.GetDotNetProjects();
 
+        // Get list of projects in the .sln file
+        solutions.ForEach(PopulateProjectsInSolutionFile);
+
+        // Add projects to their solutions
         foreach (Solution solution in solutions)
         {
-            PopulateProjectsInSolutionFile(solution);
+            // Get the projects underneath the solution directory
+            var projectsForSolution =
+                projects.Where(p => p.Path.StartsWith(solution.Path));
 
-            var projectFiles =
-                Directory.GetFiles(solution.Path,
-                    "*.csproj", SearchOption.AllDirectories);
-
+            // Filter out projects in directory, but not in .sln file,
+            // if ignoring projects that aren't in the solution file
             if (ignoreUnusedProjects)
             {
-                projectFiles =
-                    projectFiles.Where(p =>
-                        solution.ProjectsInSolution.Contains(p.SplitPath().Last())).ToArray();
+                projectsForSolution =
+                    projectsForSolution.Where(p =>
+                        solution.ProjectsInSolution.Contains(p.Name));
             }
 
-            foreach (var projectFile in projectFiles)
+            foreach (DotNetProject projectFile in projectsForSolution)
             {
-                DotNetProject project = 
-                    ProjectParser.GetProject(projectFile, 
-                        File.ReadAllLines(projectFile), latestVersions);
+                DotNetProject project =
+                    ProjectParser.ParseProjectFileText(projectFile.FullName,
+                        File.ReadAllLines(projectFile.FullName));
 
                 solution.Projects.Add(project);
             }
