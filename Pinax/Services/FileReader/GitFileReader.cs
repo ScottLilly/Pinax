@@ -1,5 +1,6 @@
 ﻿using Octokit;
 using Pinax.Models;
+using Pinax.Models.Projects;
 
 namespace Pinax.Services.FileReader;
 
@@ -16,13 +17,27 @@ public class GitFileReader : IFileReader
         _path = path;
     }
 
-    public IEnumerable<FileDetails> GetSolutionFiles()
+    public List<Solution> GetSolutions()
     {
         return _githubClient
             .Search
             .SearchCode(new SearchCodeRequest($"user:{_path} extension:sln"))
             .Result
             .Items
-            .Select(i => new FileDetails(i.Repository.HtmlUrl, i.Name));
+            .Select(i => new FileDetails(i.Repository.HtmlUrl, i.Name))
+            .Select(fd => new Solution(fd))
+            .ToList();
+    }
+
+    public List<DotNetProject> GetDotNetProjects()
+    {
+        return _githubClient
+            .Search
+            .SearchCode(new SearchCodeRequest($"user:{_path} extension:csproj"))
+            .Result
+            .Items
+            .Select(i => new FileDetails(i.Repository.HtmlUrl, i.Name))
+            .Select(fd => new DotNetProject(fd))
+            .ToList();
     }
 }

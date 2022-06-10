@@ -1,4 +1,5 @@
 ﻿using Pinax.Models;
+using Pinax.Models.Projects;
 
 namespace Pinax.Services.FileReader;
 
@@ -11,11 +12,23 @@ public class DiskFileReader : IFileReader
         _path = path;
     }
 
-    public IEnumerable<FileDetails> GetSolutionFiles()
+    public List<Solution> GetSolutions()
     {
         return 
-            Directory.GetFiles(_path, "*.sln", SearchOption.AllDirectories)
+            (Directory.GetFiles(_path, "*.sln", SearchOption.AllDirectories)
                 .Select(f => new FileInfo(f))
-                .Select(f => new FileDetails(f.DirectoryName ?? _path, f.Name));
+                .Select(fi => new FileDetails(fi.DirectoryName ?? _path, fi.Name)))
+            .Select(fd => new Solution(fd))
+            .ToList();
+    }
+
+    public List<DotNetProject> GetDotNetProjects()
+    {
+        return
+            (Directory.GetFiles(_path, "*.csproj", SearchOption.AllDirectories)
+                .Select(f => new FileInfo(f))
+                .Select(fi => new FileDetails(fi.DirectoryName ?? _path, fi.Name)))
+            .Select(fd => new DotNetProject(fd))
+            .ToList();
     }
 }

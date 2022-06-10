@@ -17,7 +17,7 @@ public class Job
 
     private IEnumerable<Solution> SolutionsToDisplay =>
         _onlyShowOutdated
-            ? _solutions.Where(s => s.HasAnOutdatedProject(_warningLevel))
+            ? _solutions.Where(s => s.HasAnOutdatedProject(_latestDotNetVersions, _warningLevel))
             : _solutions;
 
     public List<string> Results { get; } = new();
@@ -64,7 +64,7 @@ public class Job
 
             foreach (DotNetProject project in solution.Projects)
             {
-                bool isOutdated = project.IsOutdated(_warningLevel);
+                bool isOutdated = project.IsOutdated(_latestDotNetVersions, _warningLevel);
 
                 string outdatedProjectIndicator = isOutdated ? "*" : "";
                 bool notInSolution =
@@ -104,8 +104,7 @@ public class Job
     private void PopulateSolutionsFromDisk(string location)
     {
         _solutions.AddRange(
-            DiskService.GetSolutions(location, 
-                    _latestDotNetVersions, _ignoreUnusedProjects)
+            DiskService.GetSolutions(location, _ignoreUnusedProjects)
                 .Where(s =>
                     _excludedLocations.None(e =>
                         s.Name.StartsWith(e, StringComparison.InvariantCultureIgnoreCase)))
@@ -115,8 +114,7 @@ public class Job
     private void PopulateSolutionsFromGitHub(string location)
     {
         var solutions =
-            GitHubService.GetSolutions(location, 
-                _latestDotNetVersions);
+            GitHubService.GetSolutions(location);
 
         _solutions.AddRange(solutions);
     }

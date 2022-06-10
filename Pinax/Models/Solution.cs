@@ -14,8 +14,9 @@ public class Solution
 
     public string FullName =>
         System.IO.Path.Combine(Path, Name);
-    public bool HasAnOutdatedProject(Enums.WarningLevel warningLevel) =>
-        Projects.Any(p => p.IsOutdated(warningLevel));
+    public bool HasAnOutdatedProject(DotNetVersions dotNetVersions,
+        Enums.WarningLevel warningLevel) =>
+        Projects.Any(p => p.IsOutdated(dotNetVersions, warningLevel));
 
     public Solution(FileDetails fileDetails)
     {

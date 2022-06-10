@@ -1,8 +1,10 @@
 ﻿using Pinax.Models;
+using Pinax.Models.Projects;
 
 namespace Pinax.Services.FileReader;
 
 public interface IFileReader
 {
-    IEnumerable<FileDetails> GetSolutionFiles();
+    List<Solution> GetSolutions();
+    List<DotNetProject> GetDotNetProjects();
 }
