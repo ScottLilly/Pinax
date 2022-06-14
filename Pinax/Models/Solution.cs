@@ -6,8 +6,8 @@ public class Solution
 {
     private readonly FileDetails _fileDetails;
 
-    public List<string> ProjectsInSolution { get; } = new();
-    public List<DotNetProject> Projects { get; } = new();
+    public List<string> ProjectsListedInSolutionFile { get; } = new();
+    public List<DotNetProject> ProjectsFound { get; } = new();
 
     public string Path => _fileDetails.Path;
     public string Name => _fileDetails.Name;
@@ -16,7 +16,7 @@ public class Solution
         System.IO.Path.Combine(Path, Name);
     public bool HasAnOutdatedProject(DotNetVersions dotNetVersions,
         Enums.WarningLevel warningLevel) =>
-        Projects.Any(p => p.IsOutdated(dotNetVersions, warningLevel));
+        ProjectsFound.Any(p => p.IsOutdated(dotNetVersions, warningLevel));
 
     public Solution(FileDetails fileDetails)
     {

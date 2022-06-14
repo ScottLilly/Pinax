@@ -36,7 +36,7 @@ public static class DiskService
             {
                 projectsForSolution =
                     projectsForSolution.Where(p =>
-                        solution.ProjectsInSolution.Contains(p.Name));
+                        solution.ProjectsListedInSolutionFile.Contains(p.Name));
             }
 
             foreach (DotNetProject projectFile in projectsForSolution)
@@ -45,7 +45,7 @@ public static class DiskService
                     ProjectParser.ParseProjectFileText(projectFile.FullName,
                         File.ReadAllLines(projectFile.FullName));
 
-                solution.Projects.Add(project);
+                solution.ProjectsFound.Add(project);
             }
         }
 
@@ -64,7 +64,7 @@ public static class DiskService
 
             if (!string.IsNullOrWhiteSpace(projectFileName))
             {
-                solution.ProjectsInSolution.Add(projectFileName);
+                solution.ProjectsListedInSolutionFile.Add(projectFileName);
             }
         }
     }

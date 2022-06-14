@@ -13,4 +13,10 @@ public static class PersistenceService
             ? JsonConvert.DeserializeObject<DotNetVersions>(File.ReadAllText(LATEST_DOT_NET_VERSIONS_FILE_NAME))
             : new DotNetVersions();
     }
+
+    public static void OutputResults(string outputFileName, Job job)
+    {
+        File.WriteAllText(outputFileName, 
+            JsonConvert.SerializeObject(job, Formatting.Indented));
+    }
 }

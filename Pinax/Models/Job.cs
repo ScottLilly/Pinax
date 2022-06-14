@@ -1,4 +1,6 @@
-﻿using Pinax.Models.Projects;
+﻿using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+using Pinax.Models.Projects;
 using Pinax.Services;
 
 namespace Pinax.Models;
@@ -15,27 +17,35 @@ public class Job
 
     private readonly List<Solution> _solutions = new();
 
-    private IEnumerable<Solution> SolutionsToDisplay =>
+    [JsonProperty("Solutions")]
+    public IEnumerable<Solution> SolutionsToDisplay =>
         _onlyShowOutdated
             ? _solutions.Where(s => s.HasAnOutdatedProject(_latestDotNetVersions, _warningLevel))
             : _solutions;
 
+    [Newtonsoft.Json.JsonIgnore]
     public List<string> Results { get; } = new();
+    [Newtonsoft.Json.JsonIgnore]
     public List<string> ValidationErrors { get; } = new();
+    [Newtonsoft.Json.JsonIgnore]
+    public string OutputFileName { get; } = "";
 
+    [Newtonsoft.Json.JsonIgnore]
     public bool IsValid => ValidationErrors.None();
 
     public Job(Enums.Source fileSource,
         DotNetVersions latestDotNetVersions,
         Enums.WarningLevel warningLevel,
         bool onlyShowOutdated,
-        bool ignoreUnusedProjects)
+        bool ignoreUnusedProjects, string outputFileName)
     {
         _fileSource = fileSource;
         _latestDotNetVersions = latestDotNetVersions;
         _warningLevel = warningLevel;
         _onlyShowOutdated = onlyShowOutdated;
         _ignoreUnusedProjects = ignoreUnusedProjects;
+
+        OutputFileName = outputFileName;
     }
 
     public void AddIncludedLocation(string location)
@@ -62,13 +72,13 @@ public class Job
         {
             Results.Add($"SOLUTION: {Path.Combine(solution.Path, solution.Name)}");
 
-            foreach (DotNetProject project in solution.Projects)
+            foreach (DotNetProject project in solution.ProjectsFound)
             {
                 bool isOutdated = project.IsOutdated(_latestDotNetVersions, _warningLevel);
 
                 string outdatedProjectIndicator = isOutdated ? "*" : "";
                 bool notInSolution =
-                    solution.ProjectsInSolution.None(p => p == project.Name);
+                    solution.ProjectsListedInSolutionFile.None(p => p == project.Name);
                 string notInSolutionIndicator = notInSolution ? "?" : "";
 
                 Results.Add($"{notInSolutionIndicator}{outdatedProjectIndicator}\tPROJECT: {project.Name} [{string.Join(';', project.ProjectTypes)}]");
