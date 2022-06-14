@@ -41,9 +41,17 @@ do
             {
                 job.Execute();
 
-                foreach (var result in job.Results)
+                if (string.IsNullOrEmpty(job.OutputFileName))
                 {
-                    Console.WriteLine(result);
+                    foreach (var result in job.Results)
+                    {
+                        Console.WriteLine(result);
+                    }
+                }
+                else
+                {
+                    PersistenceService.OutputResults(job.OutputFileName, job);
+                    Console.WriteLine($"Created file: {job.OutputFileName}");
                 }
             }
         }

@@ -1,4 +1,5 @@
-﻿using Pinax.Models.ProjectTypes;
+﻿using Newtonsoft.Json;
+using Pinax.Models.ProjectTypes;
 
 namespace Pinax.Models.Projects;
 
@@ -6,6 +7,7 @@ public class DotNetProject : IProject<DotNetProjectType>
 {
     private readonly FileDetails _fileDetails;
 
+    [JsonProperty("SupportedDotNetVersions")]
     public List<DotNetProjectType> ProjectTypes { get; } = new();
     public List<Package> Packages { get; } = new();
 

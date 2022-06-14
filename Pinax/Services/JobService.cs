@@ -16,6 +16,7 @@ public static class JobService
         Enums.WarningLevel warningLevel = Enums.WarningLevel.Minor;
         bool onlyShowOutdated = false;
         bool ignoreUnusedProjects = false;
+        string outputFileName = "";
 
         foreach (var cmd in commands)
         {
@@ -57,13 +58,17 @@ public static class JobService
             {
                 ignoreUnusedProjects = true;
             }
+            else if (key.Matches("output"))
+            {
+                outputFileName = val.Trim();
+            }
         }
 
         // TODO: Handle bad parameters
 
         var job =
             new Job(source, dotNetVersions, warningLevel, 
-                onlyShowOutdated, ignoreUnusedProjects);
+                onlyShowOutdated, ignoreUnusedProjects, outputFileName);
 
         foreach (string location in includedLocations)
         {

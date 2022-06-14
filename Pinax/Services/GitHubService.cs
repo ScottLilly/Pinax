@@ -34,13 +34,13 @@ public static class GitHubService
         // Add projects to their solutions
         foreach (DotNetProject project in projects)
         {
-            // TODO: Populate Solution.ProjectsInSolution (from .sln file)
+            // TODO: Populate Solution.ProjectsListedInSolutionFile (from .sln file)
             // and apply "--ignoreunused" parameter, is passed
             // See existing implementation in DiskService.GetSolutions()
             Solution? parentSolution =
                 solutions.FirstOrDefault(s => s.Path == project.Path);
 
-            parentSolution?.Projects.Add(project);
+            parentSolution?.ProjectsFound.Add(project);
         }
 
         return solutions.ToList();
@@ -61,7 +61,7 @@ public static class GitHubService
 
         //    if (!string.IsNullOrWhiteSpace(projectFileName))
         //    {
-        //        solution.ProjectsInSolution.Add(projectFileName);
+        //        solution.ProjectsListedInSolutionFile.Add(projectFileName);
         //    }
         //}
     }

@@ -55,6 +55,6 @@ public class TestProjectParser
                                  p.Version.Minor == 0));
         Assert.Single(project.Packages);
         Assert.Equal("Markdig", project.Packages[0].Name);
-        Assert.Equal(new Version(0, 28,1), project.Packages[0].Version);
+        Assert.Equal(new Version(0, 28,1), project.Packages[0].VersionInUse);
     }
 }

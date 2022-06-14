@@ -132,7 +132,7 @@ public static class ProjectParser
                 packages.Add(new Package
                 {
                     Name = packageReference.Attributes("Include").First().Value,
-                    Version = Version.Parse(packageReference.Attributes("Version").First().Value)
+                    VersionInUse = Version.Parse(packageReference.Attributes("Version").First().Value)
                 });
             }
         }
@@ -162,7 +162,7 @@ public static class ProjectParser
                 var newPackage = new Package
                 {
                     Name = packageElement.Attributes("id").First().Value,
-                    Version = Version.Parse(packageElement.Attributes("version").First().Value)
+                    VersionInUse = Version.Parse(packageElement.Attributes("version").First().Value)
                 };
 
                 packages.Add(newPackage);
