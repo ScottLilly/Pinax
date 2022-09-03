@@ -15,10 +15,7 @@ To run this, start the program and type:
 **NOTES:**
 - When passing a drive path, Pinax searchs that directory and all diretories underneath it (recursively)
 - Parameters can be combined and are not required to be in any specific order
-- Pinax considers the "current" version of the different .NETs to be:
-  - .NET Framework: 4.8
-  - .NET Core 3.1
-  - .NET 6
+- Pinax considers these to be the current versions of .NET: [LatestDotNetVersions.json](https://github.com/ScottLilly/Pinax/blob/master/Pinax.Console/LatestDotNetVersions.json)
 
 ### Command examples
 Find solutions and projects under the e:\MyPublicProjects directory  
