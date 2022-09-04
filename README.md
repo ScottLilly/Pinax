@@ -52,4 +52,15 @@ SOLUTION: e:\MyPublicProjects\SudokuSolver\SudokuSolver.sln
         PROJECT: SudokuEngine.csproj [.NET Framework 4.8.0.0]
 ?*      PROJECT: SudokuSolver.csproj [.NET Framework 4.5.0.0]
         PROJECT: TestSudokuEngine.csproj [.NET Framework 4.8.0.0]
+SOLUTION: e:\MyPublicProjects\DigitsOfPi\DigitsOfPi.sln
+*       PROJECT: DigitsOfPi.csproj [.NET Framework 4.7.2.0]
+                PACKAGE: CommonServiceLocator [In project: 2.0.4] [Latest: 2.0.6.0]
+*               PACKAGE: Prism.Core [In project: 7.2.0.1367] [Latest: 8.1.97.0]
+*               PACKAGE: Prism.Wpf [In project: 7.2.0.1367] [Latest: 8.1.97.0]
+                PACKAGE: System.ValueTuple [In project: 4.5.0] [Latest: 4.5.0.0]
+*       PROJECT: DigitsOfPi.Engine.csproj [.NET Framework 4.7.2.0]
+                PACKAGE: CommonServiceLocator [In project: 2.0.4] [Latest: 2.0.6.0]
+*               PACKAGE: Prism.Core [In project: 7.2.0.1367] [Latest: 8.1.97.0]
+*               PACKAGE: Prism.Wpf [In project: 7.2.0.1367] [Latest: 8.1.97.0]
+                PACKAGE: System.ValueTuple [In project: 4.5.0] [Latest: 4.5.0.0]
 ```
