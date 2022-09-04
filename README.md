@@ -18,6 +18,9 @@ To run this, start the program and type:
 - Pinax considers these to be the current versions of .NET: [LatestDotNetVersions.json](https://github.com/ScottLilly/Pinax/blob/master/Pinax.Console/LatestDotNetVersions.json)
 
 ### Command examples
+See available parameters   
+```--help```
+
 Find solutions and projects under the e:\MyPublicProjects directory  
 ```--source:disk --location:e:\MyPublicProjects```
 
