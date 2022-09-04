@@ -28,9 +28,17 @@ public static class ProjectParser
         // Get latest version of each package from NuGet
         foreach (Package package in project.Packages)
         {
-            package.LatestNuGetVersion = 
-                PackageManagerService.GetPackageVersions(package.Name)
-                    .Result.Last().Version;
+            try
+            {
+                package.LatestNuGetVersion =
+                    PackageManagerService.GetPackageVersions(package.Name)
+                        .Result.Last().Version;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unable to retrieve NuGet information for: {package.Name}");
+                package.LatestNuGetVersion = new Version(0, 0, 0, 0);
+            }
         }
 
         return project;
