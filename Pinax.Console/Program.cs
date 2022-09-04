@@ -90,11 +90,11 @@ void DisplayHelpText()
 {
     Console.WriteLine("REQUIRED PARAMETERS");
     Console.WriteLine("--source\tValid options: disk|github");
-    Console.WriteLine("--location\tGitHub URL or disk path (can be passed multiple times)");
+    Console.WriteLine("--location\tDisk path (can be passed multiple times)");
     Console.WriteLine("");
     Console.WriteLine("OPTIONAL PARAMETERS");
-    Console.WriteLine("--exclude\tGitHub URL or disk path (can be passed multiple times)");
-    Console.WriteLine("--warning\tLevel to consider outdated. Valid options: major|minor|build|revision");
+    Console.WriteLine("--exclude\tDisk path (can be passed multiple times)");
+    Console.WriteLine("--warning\tVersion level to consider outdated. Valid options: major|minor|build|revision");
     Console.WriteLine("--outdated\tIf passed, only show solutions with outdated projects or packages");
     Console.WriteLine("--ignoreunused\tIf passed, does not check projects that are not in the solution file");
     Console.WriteLine("");

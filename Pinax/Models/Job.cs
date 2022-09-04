@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Pinax.Models.Projects;
 using Pinax.Services;
 
@@ -37,7 +36,8 @@ public class Job
         DotNetVersions latestDotNetVersions,
         Enums.WarningLevel warningLevel,
         bool onlyShowOutdated,
-        bool ignoreUnusedProjects, string outputFileName)
+        bool ignoreUnusedProjects, 
+        string outputFileName)
     {
         _fileSource = fileSource;
         _latestDotNetVersions = latestDotNetVersions;
