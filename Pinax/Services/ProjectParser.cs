@@ -140,7 +140,8 @@ public static class ProjectParser
                 packages.Add(new Package
                 {
                     Name = packageReference.Attributes("Include").First().Value,
-                    VersionInUse = Version.Parse(packageReference.Attributes("Version").First().Value)
+                    RawVersion = packageReference.Attributes("Version").First().Value,
+                    VersionInUse = packageReference.Attributes("Version").First().Value.ToVersion()
                 });
             }
         }

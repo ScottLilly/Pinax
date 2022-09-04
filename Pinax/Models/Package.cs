@@ -3,6 +3,7 @@
 public class Package
 {
     public string Name { get; set; }
+    public string RawVersion { get; set; }
     public Version VersionInUse { get; set; }
     public Version LatestNuGetVersion { get; set; }
 

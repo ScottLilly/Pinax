@@ -51,4 +51,32 @@ public static class ExtensionMethods
     {
         return new FileDetails(fileInfo.DirectoryName ?? "", fileInfo.Name);
     }
+
+    public static Version ToVersion(this string rawVersion)
+    {
+        try
+        {
+            rawVersion = rawVersion.Replace('-', '.');
+            string cleanVersion = "";
+
+            foreach (char c in rawVersion)
+            {
+                if (char.IsDigit(c) || c == '.')
+                {
+                    cleanVersion += c;
+                }
+            }
+
+            if (cleanVersion.Substring(cleanVersion.Length - 1) == ".")
+            {
+                cleanVersion = cleanVersion.Substring(0, cleanVersion.Length - 1);
+            }
+
+            return Version.Parse(cleanVersion);
+        }
+        catch (Exception e)
+        {
+            return new Version(0, 0, 0, 0);
+        }
+    }
 }
