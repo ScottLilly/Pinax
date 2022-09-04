@@ -17,7 +17,7 @@ To run this, start the program and type:
 - Parameters can be combined and are not required to be in any specific order
 - Pinax considers these to be the current versions of .NET: [LatestDotNetVersions.json](https://github.com/ScottLilly/Pinax/blob/master/Pinax.Console/LatestDotNetVersions.json)
 
-### Command examples
+## Command examples
 See available parameters   
 ```--help```
 
@@ -43,3 +43,13 @@ Find solutions and projects under the e:\MyPublicProjects directory.
 Use "build" level of version to warn if package is out-of-date   
 Warning options: major, minor, build, revision (not case-sensitive)   
 ```--source:disk --location:e:\MyPublicProjects --warning:build```
+
+## Sample output
+"?" Indicates project is not included in solution file   
+"*" Indicates version is out-of-date   
+```
+SOLUTION: e:\MyPublicProjects\SudokuSolver\SudokuSolver.sln
+        PROJECT: SudokuEngine.csproj [.NET Framework 4.8.0.0]
+?*      PROJECT: SudokuSolver.csproj [.NET Framework 4.5.0.0]
+        PROJECT: TestSudokuEngine.csproj [.NET Framework 4.8.0.0]
+```
