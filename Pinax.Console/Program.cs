@@ -1,26 +1,61 @@
-﻿using Microsoft.Extensions.Configuration;
-using Pinax.Models;
+﻿using Pinax.Models;
 using Pinax.Services;
+
 
 DisplayAppInfo();
 
-DotNetVersions latestDotNetVersions =
-    PersistenceService.GetLatestDotNetVersions();
-
-SetupPinaxInstance();
-
 // Wait for user commands
-string? command = "";
-
+if (ExecuteParamCommands(args)) { return; };
 do
+{
+    string? command = Console.ReadLine();
+    RunCommands(command);
+} while (true);
+
+
+
+bool ExecuteParamCommands(string[] args)
 {
     try
     {
-        command = Console.ReadLine();
+        string param = string.Join(" ", ParamHandler(args));
+        if (!string.IsNullOrEmpty(param))
+        {
+            RunCommands(param);
+            return true;
+        }
+        return false;
+    }
+    catch { return false; }
+}
+
+
+/// <summary>
+/// Arguments handler for parameter usage.
+/// </summary>
+/// <param name="args"></param>
+/// <returns></returns>
+List<string> ParamHandler(string[] args)
+{
+    List<string> argList = new List<string>();
+    foreach (var arg in args)
+    {
+        argList.Add(arg);
+    }
+    return argList;
+}
+
+void RunCommands(string command)
+{
+
+    DotNetVersions latestDotNetVersions =
+        PersistenceService.GetLatestDotNetVersions();
+    try
+    {
 
         if (command == null)
         {
-            continue;
+            return;
         }
 
         if (command.Equals("--help"))
@@ -31,6 +66,11 @@ do
         {
             Console.Clear();
             DisplayAppInfo();
+        }
+
+        else if (command == "--exit")
+        {
+            Environment.Exit(0);
         }
         else
         {
@@ -61,26 +101,9 @@ do
         Console.ForegroundColor = ConsoleColor.Red;
         Console.Error.WriteLine(e);
         Console.ForegroundColor = ConsoleColor.White;
-        command = "--exit";
     }
-
-} while (!command?.Equals("--exit", StringComparison.InvariantCultureIgnoreCase) ?? true);
-
-void SetupPinaxInstance()
-{
-    // Currently not connecting to GitHub, due to throttling issues
-
-    //var builder = new ConfigurationBuilder()
-    //    .SetBasePath(Directory.GetCurrentDirectory())
-    //    .AddUserSecrets<Program>();
-
-    //var configuration = builder.Build();
-
-    //string userSecretsToken =
-    //    configuration.AsEnumerable().First(c => c.Key == "GitHubToken").Value;
-
-    //GitHubService.SetToken(userSecretsToken);
 }
+
 
 void DisplayAppInfo()
 {
