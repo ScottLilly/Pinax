@@ -1,6 +1,6 @@
 # Pinax
 
-Console utility to report if C# projects have outdated versions of .NET (Framework, Core, or the new .NET) or if the NuGet packages are out-of-date. 
+Console utility to report if C# projects have outdated versions of .NET (Standard, Framework, Core, or the new .NET) or if any NuGet packages are outdated. 
 It will also report if there are any projects (.csproj files) under a solution directory, but not included in the solution.
 
 This currently runs by pointing at a directory or directories.
