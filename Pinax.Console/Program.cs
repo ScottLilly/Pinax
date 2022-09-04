@@ -68,16 +68,18 @@ do
 
 void SetupPinaxInstance()
 {
-    var builder = new ConfigurationBuilder()
-        .SetBasePath(Directory.GetCurrentDirectory())
-        .AddUserSecrets<Program>();
+    // Currently not connecting to GitHub, due to throttling issues
 
-    var configuration = builder.Build();
+    //var builder = new ConfigurationBuilder()
+    //    .SetBasePath(Directory.GetCurrentDirectory())
+    //    .AddUserSecrets<Program>();
 
-    string userSecretsToken =
-        configuration.AsEnumerable().First(c => c.Key == "GitHubToken").Value;
+    //var configuration = builder.Build();
 
-    GitHubService.SetToken(userSecretsToken);
+    //string userSecretsToken =
+    //    configuration.AsEnumerable().First(c => c.Key == "GitHubToken").Value;
+
+    //GitHubService.SetToken(userSecretsToken);
 }
 
 void DisplayAppInfo()
