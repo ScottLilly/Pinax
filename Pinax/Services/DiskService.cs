@@ -11,7 +11,11 @@ public static class DiskService
     {
         if (!Directory.Exists(rootDirectory))
         {
+            Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"Directory '{rootDirectory}' does not exist");
+            Console.ForegroundColor = ConsoleColor.White;
+
+            return new List<Solution>();
         }
 
         IFileReader diskFileReader =
