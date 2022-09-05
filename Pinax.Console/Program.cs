@@ -1,100 +1,84 @@
-﻿using Pinax.Models;
+﻿using Pinax;
+using Pinax.Models;
 using Pinax.Services;
-
 
 DisplayAppInfo();
 
+DotNetVersions latestDotNetVersions =
+    PersistenceService.GetLatestDotNetVersions();
+
+// If parameters were passed in, run the job for them
+if (args.Any())
+{
+    RunCommand(string.Join(' ', args));
+};
+
 // Wait for user commands
-if (ExecuteParamCommands(args)) { return; };
-do
+while(true)
 {
     string? command = Console.ReadLine();
-    RunCommands(command);
-} while (true);
 
-
-
-bool ExecuteParamCommands(string[] args)
-{
-    try
+    if (command == null || string.IsNullOrWhiteSpace(command))
     {
-        string param = string.Join(" ", ParamHandler(args));
-        if (!string.IsNullOrEmpty(param))
-        {
-            RunCommands(param);
-            return true;
-        }
-        return false;
+        continue;
     }
-    catch { return false; }
+    
+    if (command.Matches("--exit"))
+    {
+        break;
+    }
+
+    if (command.Matches("--help"))
+    {
+        DisplayHelpText();
+    }
+    else if (command.Matches("--cls"))
+    {
+        Console.Clear();
+        DisplayAppInfo();
+    }
+    else
+    {
+        RunCommand(command);
+    }
 }
 
-
-/// <summary>
-/// Arguments handler for parameter usage.
-/// </summary>
-/// <param name="args"></param>
-/// <returns></returns>
-List<string> ParamHandler(string[] args)
+void RunCommand(string command)
 {
-    List<string> argList = new List<string>();
-    foreach (var arg in args)
+    if (string.IsNullOrWhiteSpace(command))
     {
-        argList.Add(arg);
+        return;
     }
-    return argList;
-}
 
-void RunCommands(string command)
-{
-
-    DotNetVersions latestDotNetVersions =
-        PersistenceService.GetLatestDotNetVersions();
     try
     {
+        var job =
+            JobService.BuildJobFromCommand(command, latestDotNetVersions);
 
-        if (command == null)
+        if (!job.IsValid)
         {
+            WriteLine("Invalid parameters. Unable to run the job.", ConsoleColor.Red);
             return;
         }
 
-        if (command.Equals("--help"))
+        WriteLine("Version check started", ConsoleColor.Green);
+
+        job.Execute();
+            
+        // Display results
+        foreach (var result in job.Results)
         {
-            DisplayHelpText();
-        }
-        else if (command == "--cls")
-        {
-            Console.Clear();
-            DisplayAppInfo();
+            WriteLine(result);
         }
 
-        else if (command == "--exit")
+        if (job.OutputFileName.IsNotNullEmptyOrWhiteSpace())
         {
-            Environment.Exit(0);
-        }
-        else
-        {
-            var job =
-                JobService.BuildJobFromCommand(command, latestDotNetVersions);
+            PersistenceService.OutputResults(job.OutputFileName, job);
 
-            if (job.IsValid)
-            {
-                job.Execute();
-
-                if (string.IsNullOrEmpty(job.OutputFileName))
-                {
-                    foreach (var result in job.Results)
-                    {
-                        Console.WriteLine(result);
-                    }
-                }
-                else
-                {
-                    PersistenceService.OutputResults(job.OutputFileName, job);
-                    Console.WriteLine($"Created file: {job.OutputFileName}");
-                }
-            }
+            WriteLine($"Created file: {job.OutputFileName}", ConsoleColor.Cyan);
         }
+
+        WriteLine("Version check completed", ConsoleColor.Green);
     }
     catch (Exception e)
     {
@@ -103,7 +87,6 @@ void RunCommands(string command)
         Console.ForegroundColor = ConsoleColor.White;
     }
 }
-
 
 void DisplayAppInfo()
 {
@@ -125,4 +108,11 @@ void DisplayHelpText()
     Console.WriteLine("");
     Console.WriteLine("--cls\t\tClear screen");
     Console.WriteLine("--exit\t\tStops running Pinax");
+}
+
+void WriteLine(string message, ConsoleColor color = ConsoleColor.White)
+{
+    Console.ForegroundColor = color;
+    Console.WriteLine(message);
+    Console.ForegroundColor = ConsoleColor.White;
 }

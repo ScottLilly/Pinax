@@ -14,15 +14,11 @@ public static class ExtensionMethods
 
     public static bool Matches(this string text, string comparisonText)
     {
-        if (text == null || comparisonText == null)
-        {
-            return false;
-        }
-
-        return text.Equals(comparisonText, StringComparison.InvariantCultureIgnoreCase);
+        return text.Trim().Equals(comparisonText.Trim(), 
+            StringComparison.InvariantCultureIgnoreCase);
     }
 
-    public static bool None<T>(this IEnumerable<T> elements, Func<T, bool> func = null)
+    public static bool None<T>(this IEnumerable<T> elements, Func<T, bool>? func = null)
     {
         return func == null
             ? !elements.Any()
@@ -57,15 +53,10 @@ public static class ExtensionMethods
         try
         {
             rawVersion = rawVersion.Replace('-', '.');
-            string cleanVersion = "";
 
-            foreach (char c in rawVersion)
-            {
-                if (char.IsDigit(c) || c == '.')
-                {
-                    cleanVersion += c;
-                }
-            }
+            string cleanVersion = 
+                rawVersion.Where(c => char.IsDigit(c) || c == '.')
+                    .Aggregate("", (current, c) => current + c);
 
             if (cleanVersion.Substring(cleanVersion.Length - 1) == ".")
             {
