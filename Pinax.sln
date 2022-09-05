@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32421.90
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pinax", "Pinax\Pinax.csproj", "{69AD7A93-9723-4C68-9E8B-EB668ABAAC57}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pinax.Engine", "Pinax.Engine\Pinax.Engine.csproj", "{69AD7A93-9723-4C68-9E8B-EB668ABAAC57}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Pinax", "Test.Pinax\Test.Pinax.csproj", "{B765F881-2038-4DE6-A108-7BDC72612E2E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.Pinax.Engine", "Test.Pinax.Engine\Test.Pinax.Engine.csproj", "{B765F881-2038-4DE6-A108-7BDC72612E2E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pinax.Console", "Pinax.Console\Pinax.Console.csproj", "{6EE611B1-EF49-489A-AB5C-AF5166A3FE4B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pinax.Console", "Pinax.Console\Pinax.Console.csproj", "{6EE611B1-EF49-489A-AB5C-AF5166A3FE4B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

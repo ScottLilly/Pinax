@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <UserSecretsId>e934e0d3-00cd-4703-bc1f-778a5b8dfb19</UserSecretsId>
+    <AssemblyName>Pinax</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Pinax\Pinax.csproj" />
+    <ProjectReference Include="..\Pinax.Engine\Pinax.Engine.csproj" />
   </ItemGroup>
 
   <ItemGroup>
