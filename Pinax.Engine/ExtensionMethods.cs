@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using System.Xml.Linq;
 using Octokit;
 using Pinax.Engine.Models;
 
@@ -10,6 +11,23 @@ public static class ExtensionMethods
     public static bool IsNotNullEmptyOrWhiteSpace(this string text)
     {
         return !string.IsNullOrWhiteSpace(text);
+    }
+
+    public static string GetValue(this XElement element, string name)
+    {
+        if (element.Attributes(name).Any())
+        {
+            return element.Attributes(name).First().Value;
+        }
+        else
+        {
+            if (element.Descendants().Any(d => d.Name == name))
+            {
+                return element.Descendants().First(d => d.Name == name).Value;
+            }
+        }
+
+        return "";
     }
 
     public static bool Matches(this string text, string comparisonText)
