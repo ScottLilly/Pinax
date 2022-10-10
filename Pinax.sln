@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.Pinax.Engine", "Test.P
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pinax.Console", "Pinax.Console\Pinax.Console.csproj", "{6EE611B1-EF49-489A-AB5C-AF5166A3FE4B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pinax.UI", "Pinax.UI\Pinax.UI.csproj", "{130E5BB5-3A94-45E6-8AD8-ED1E5D60E18E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{6EE611B1-EF49-489A-AB5C-AF5166A3FE4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6EE611B1-EF49-489A-AB5C-AF5166A3FE4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6EE611B1-EF49-489A-AB5C-AF5166A3FE4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{130E5BB5-3A94-45E6-8AD8-ED1E5D60E18E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{130E5BB5-3A94-45E6-8AD8-ED1E5D60E18E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{130E5BB5-3A94-45E6-8AD8-ED1E5D60E18E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{130E5BB5-3A94-45E6-8AD8-ED1E5D60E18E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
