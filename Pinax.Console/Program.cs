@@ -97,7 +97,6 @@ void DisplayAppInfo()
 void DisplayHelpText()
 {
     Console.WriteLine("REQUIRED PARAMETERS");
-    Console.WriteLine("--source\tValid options: disk|github");
     Console.WriteLine("--location\tDisk path (can be passed multiple times)");
     Console.WriteLine("");
     Console.WriteLine("OPTIONAL PARAMETERS");

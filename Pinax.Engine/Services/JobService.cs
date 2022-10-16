@@ -10,7 +10,7 @@ public static class JobService
         var commands =
             command.Trim().Split("--", StringSplitOptions.RemoveEmptyEntries);
 
-        Enums.Source source = Enums.Source.Unknown;
+        Enums.Source source = Enums.Source.Disk;
         List<string> includedLocations = new List<string>();
         List<string> excludedLocations = new List<string>();
         Enums.WarningLevel warningLevel = Enums.WarningLevel.Minor;
@@ -34,11 +34,7 @@ public static class JobService
             }
 
             // Handle key/value parameters
-            if (key.Matches("source"))
-            {
-                source = Enum.Parse<Enums.Source>(val, true);
-            }
-            else if (key.Matches("location"))
+            if (key.Matches("location"))
             {
                 includedLocations.Add(val.Trim());
             }
