@@ -9,7 +9,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.Pinax.Engine", "Test.P
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pinax.Console", "Pinax.Console\Pinax.Console.csproj", "{6EE611B1-EF49-489A-AB5C-AF5166A3FE4B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pinax.UI", "Pinax.UI\Pinax.UI.csproj", "{130E5BB5-3A94-45E6-8AD8-ED1E5D60E18E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pinax.UI", "Pinax.UI\Pinax.UI.csproj", "{130E5BB5-3A94-45E6-8AD8-ED1E5D60E18E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{9A1A3F05-5BD4-43BB-A62D-8ABB4298E0C2}"
+	ProjectSection(SolutionItems) = preProject
+		ReleaseNotes\ReleaseNotes_1.1.0.txt = ReleaseNotes\ReleaseNotes_1.1.0.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
