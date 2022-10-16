@@ -1,3 +1,5 @@
-Version 1.1.0 Release Notes
+Release Notes
 =======================================
+
+Version: 1.1.0
 - Starting to include release notes with new versions
