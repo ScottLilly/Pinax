@@ -68,14 +68,14 @@ public static class PackageManagerService
     {
         var packageSources = new List<NuGetPackageSource>();
 
+        string fullFilePath =
+            Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "NuGet",
+                "NuGet.config");
+
         try
         {
-            string fullFilePath =
-                Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                    "NuGet",
-                    "NuGet.config");
-
             if (File.Exists(fullFilePath))
             {
                 XmlSerializer xmlSerSale =
@@ -84,25 +84,35 @@ public static class PackageManagerService
                 StringReader stringReader =
                     new StringReader(File.ReadAllText(fullFilePath));
 
-                var info = xmlSerSale.Deserialize(stringReader);
+                var info =
+                    (NuGetConfig.configuration)xmlSerSale.Deserialize(stringReader);
+
+                packageSources.AddRange(
+                    info.packageSources
+                        .Where(ps => ps.IsWebSource)
+                        .Select(ps => new NuGetPackageSource
+                        {
+                            Url = ps.value, 
+                            ProtocolVersion = ps.protocolVersion
+                        }));
 
                 stringReader.Close();
             }
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            throw;
+            Console.WriteLine($"Error reading NuGet.config file at: {fullFilePath}");
         }
 
-        //if (sources.None())
-        //{
-        //    sources.Add(new NuGetPackageSource()
-        //    {
-        //        Url = "https://api.nuget.org/v3/index.json", 
-        //        ProtocolVersion = 3
-        //    });
-        //}
+        if (packageSources.None())
+        {
+            packageSources.Add(
+                new NuGetPackageSource
+                {
+                    Url = "https://api.nuget.org/v3/index.json",
+                    ProtocolVersion = 3
+                });
+        }
 
         return packageSources;
     }

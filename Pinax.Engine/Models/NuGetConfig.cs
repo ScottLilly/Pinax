@@ -25,7 +25,7 @@ public class NuGetConfig
     {
         private string _keyField;
         private string _valueField;
-        private byte _protocolVersionField;
+        private int _protocolVersionField;
         private bool _protocolVersionFieldSpecified;
 
         [System.Xml.Serialization.XmlAttributeAttribute()]
@@ -43,7 +43,7 @@ public class NuGetConfig
         }
 
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public byte protocolVersion
+        public int protocolVersion
         {
             get => _protocolVersionField;
             set => _protocolVersionField = value;
@@ -55,5 +55,9 @@ public class NuGetConfig
             get => _protocolVersionFieldSpecified;
             set => _protocolVersionFieldSpecified = value;
         }
+
+        public bool IsWebSource =>
+            value.StartsWith("http", StringComparison.InvariantCultureIgnoreCase) &&
+            value.EndsWith("index.json", StringComparison.InvariantCultureIgnoreCase);
     }
 }
