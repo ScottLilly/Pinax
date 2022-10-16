@@ -4,6 +4,7 @@ using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
 using Pinax.Engine.Models;
+using System.Xml.Serialization;
 
 namespace Pinax.Engine.Services;
 
@@ -65,18 +66,44 @@ public static class PackageManagerService
 
     private static List<NuGetPackageSource> GetNuGetSources()
     {
-        var sources = new List<NuGetPackageSource>();
+        var packageSources = new List<NuGetPackageSource>();
 
-
-        if (sources.None())
+        try
         {
-            sources.Add(new NuGetPackageSource()
+            string fullFilePath =
+                Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    "NuGet",
+                    "NuGet.config");
+
+            if (File.Exists(fullFilePath))
             {
-                Url = "https://api.nuget.org/v3/index.json", 
-                ProtocolVersion = 3
-            });
+                XmlSerializer xmlSerSale =
+                    new XmlSerializer(typeof(NuGetConfig.configuration));
+
+                StringReader stringReader =
+                    new StringReader(File.ReadAllText(fullFilePath));
+
+                var info = xmlSerSale.Deserialize(stringReader);
+
+                stringReader.Close();
+            }
         }
-        
-        return sources;
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+
+        //if (sources.None())
+        //{
+        //    sources.Add(new NuGetPackageSource()
+        //    {
+        //        Url = "https://api.nuget.org/v3/index.json", 
+        //        ProtocolVersion = 3
+        //    });
+        //}
+
+        return packageSources;
     }
 }

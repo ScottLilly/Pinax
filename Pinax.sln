@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pinax.UI", "Pinax.UI\Pinax.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{9A1A3F05-5BD4-43BB-A62D-8ABB4298E0C2}"
 	ProjectSection(SolutionItems) = preProject
-		ReleaseNotes\ReleaseNotes.txt = ReleaseNotes\ReleaseNotes.txt
+		Documentation\ReleaseNotes.txt = Documentation\ReleaseNotes.txt
 	EndProjectSection
 EndProject
 Global
