@@ -63,7 +63,7 @@ public static class JobService
         // TODO: Handle bad parameters
 
         var job =
-            new Job(source, dotNetVersions, warningLevel, 
+            new Job(dotNetVersions, warningLevel, 
                 onlyShowOutdated, ignoreUnusedProjects, outputFileName);
 
         foreach (string location in includedLocations)

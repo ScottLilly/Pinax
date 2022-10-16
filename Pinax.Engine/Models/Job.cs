@@ -6,7 +6,6 @@ namespace Pinax.Engine.Models;
 
 public class Job
 {
-    private readonly Enums.Source _fileSource;
     private readonly DotNetVersions _latestDotNetVersions;
     private readonly Enums.WarningLevel _warningLevel;
     private readonly bool _onlyShowOutdated;
@@ -22,24 +21,22 @@ public class Job
             ? _solutions.Where(s => s.HasAnOutdatedProject(_latestDotNetVersions, _warningLevel))
             : _solutions;
 
-    [Newtonsoft.Json.JsonIgnore]
+    [JsonIgnore]
     public List<string> Results { get; } = new();
-    [Newtonsoft.Json.JsonIgnore]
+    [JsonIgnore]
     public List<string> ValidationErrors { get; } = new();
-    [Newtonsoft.Json.JsonIgnore]
+    [JsonIgnore]
     public string OutputFileName { get; } = "";
 
-    [Newtonsoft.Json.JsonIgnore]
+    [JsonIgnore]
     public bool IsValid => ValidationErrors.None();
 
-    public Job(Enums.Source fileSource,
-        DotNetVersions latestDotNetVersions,
+    public Job(DotNetVersions latestDotNetVersions,
         Enums.WarningLevel warningLevel,
         bool onlyShowOutdated,
         bool ignoreUnusedProjects, 
         string outputFileName)
     {
-        _fileSource = fileSource;
         _latestDotNetVersions = latestDotNetVersions;
         _warningLevel = warningLevel;
         _onlyShowOutdated = onlyShowOutdated;
@@ -99,15 +96,7 @@ public class Job
     {
         foreach (var location in _includedLocations)
         {
-            switch (_fileSource)
-            {
-                case Enums.Source.Disk:
-                    PopulateSolutionsFromDisk(location);
-                    break;
-                case Enums.Source.GitHub:
-                    PopulateSolutionsFromGitHub(location);
-                    break;
-            }
+            PopulateSolutionsFromDisk(location);
         }
     }
 
@@ -119,14 +108,6 @@ public class Job
                     _excludedLocations.None(e =>
                         s.Name.StartsWith(e, StringComparison.InvariantCultureIgnoreCase)))
                 .ToList());
-    }
-
-    private void PopulateSolutionsFromGitHub(string location)
-    {
-        var solutions =
-            GitHubService.GetSolutions(location);
-
-        _solutions.AddRange(solutions);
     }
 
     #endregion
