@@ -4,4 +4,6 @@ Release Notes
 Version: 1.1.0
 - Starting to include release notes with new versions
 - Removed "--source" parameter, since "disk" is currently only available source
+	- Also removed code for reading solutions/projects from GitHub
 	- Will add back in when able to use "github" as a source
+- Read NuGet.config, to get additional package sources
