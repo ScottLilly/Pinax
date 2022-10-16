@@ -6,9 +6,4 @@ public static class FileReaderFactory
     {
         return new DiskFileReader(path);
     }
-
-    public static IFileReader GetGitFileReader(string token, string path)
-    {
-        return new GitFileReader(token, path);
-    }
 }

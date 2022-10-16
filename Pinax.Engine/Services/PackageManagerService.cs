@@ -114,6 +114,11 @@ public static class PackageManagerService
                 });
         }
 
+        foreach (var packageSource in packageSources)
+        {
+            Console.WriteLine($"Package source: {packageSource.Url}");
+        }
+
         return packageSources;
     }
 }
