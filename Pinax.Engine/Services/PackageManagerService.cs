@@ -87,6 +87,15 @@ public static class PackageManagerService
                 var info =
                     (NuGetConfig.configuration)xmlSerSale.Deserialize(stringReader);
 
+                foreach(var packageSource in info.packageSources)
+                {
+                    if (packageSource.IsWebSource && packageSource.protocolVersion == 0)
+                    {
+                        packageSource.protocolVersion = 
+                            ServiceIndexReader.GetServiceIndex(packageSource.value).ProtocolVersion;
+                    }
+                }
+
                 packageSources.AddRange(
                     info.packageSources
                         .Where(ps => ps.IsWebSource)
